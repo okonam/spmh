@@ -182,6 +182,8 @@ async def stream_video(video_id: str, request: Request):
     if not video_path: raise HTTPException(404)
     return FileResponse(video_path)
 
+import platform
+
 @app.post("/api/open/{video_id}")
 def open_explorer(video_id: str):
     video_path = None
@@ -192,13 +194,24 @@ def open_explorer(video_id: str):
                 break
     
     if video_path and os.path.exists(video_path):
-        subprocess.run(["explorer", "/select,", video_path])
-        return {"status": "opened"}
+        system = platform.system()
+        try:
+            if system == "Windows":
+                subprocess.run(["explorer", "/select,", video_path])
+            elif system == "Darwin": # macOS
+                subprocess.run(["open", "-R", video_path])
+            else: # Linux
+                # Opens the folder containing the file
+                subprocess.run(["xdg-open", os.path.dirname(video_path)])
+            return {"status": "opened"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+            
     return {"status": "not_found"}
 
 @app.post("/api/stop")
 def stop_server():
-    print("[!] Shutdown command received. Closing in 0.5s...")
+    print("[!] Shutdown command received. Closing...")
     def shutdown():
         time.sleep(0.5)
         os._exit(0)
