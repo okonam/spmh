@@ -19,11 +19,11 @@
         [x-cloak] { display: none !important; }
         .netflix-gradient { background: linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0) 50%, rgba(10,10,10,0.8) 100%); }
         .hero-mask { background: linear-gradient(to right, rgba(10,10,10,0) 30%, #0a0a0a 100%); }
-        .video-card:hover .card-actions { opacity: 1; transform: translateY(0); }
         .fade-in { animation: fadeIn 0.8s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #dc2626; cursor: pointer; }
     </style>
 </head>
 <body x-data="hubApp()" @keydown.escape="closeAll()" @scroll.window="scrolled = window.scrollY > 50">
@@ -46,7 +46,6 @@
             </div>
             <div class="flex items-center gap-4">
                 <button @click="showOnlyFavorites = !showOnlyFavorites" class="flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-bold uppercase text-xs border" :class="showOnlyFavorites ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'"><svg class="w-5 h-5" :fill="showOnlyFavorites ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>Favorites</button>
-                <button @click="showSyncInfo = true" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl border border-white/10 transition-all group"><svg class="w-5 h-5 text-white/60 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path></svg><span class="text-xs font-black uppercase tracking-tighter">Sync Library</span></button>
                 <button @click="showShutdown = true" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-xl transition-all flex items-center gap-3 shadow-lg shadow-red-600/20 font-bold uppercase text-xs tracking-tighter"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>Shutdown</button>
             </div>
         </div>
@@ -57,35 +56,26 @@
         <template x-for="(vid, index) in featuredList" :key="vid.id">
             <div x-show="heroIndex === index" x-transition.opacity.duration.1000ms class="absolute inset-0">
                 <div class="absolute inset-0 flex">
-                    <div class="w-[70%] h-full relative overflow-hidden bg-black">
+                    <div class="w-full lg:w-[70%] h-full relative overflow-hidden bg-black">
                         <video x-show="heroIndex === index" autoplay muted loop playsinline :src="'/api/stream/' + vid.id" class="w-full h-full object-cover opacity-60 scale-110" @loadedmetadata="$el.currentTime = Math.random() * ($el.duration * 0.8)"></video>
                         <div class="absolute inset-0 hero-mask"></div>
                     </div>
-                    <div class="w-[30%] h-full relative"><img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover opacity-30"><div class="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent"></div></div>
+                    <div class="hidden lg:block lg:w-[30%] h-full relative"><img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover opacity-30"><div class="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent"></div></div>
                 </div>
                 <div class="absolute inset-0 netflix-gradient"></div>
                 <div class="absolute bottom-[25%] left-10 md:left-20 max-w-4xl z-10">
                     <div class="flex items-center gap-4 mb-6"><span class="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded uppercase tracking-widest">Featured Now</span><button @click="shuffleHero()" class="flex items-center gap-2 text-xs font-bold text-white/40 hover:text-white transition-colors group"><svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path></svg>Shuffle Suggestions</button></div>
                     <h1 class="text-6xl md:text-9xl font-black mt-2 mb-10 drop-shadow-2xl line-clamp-2 leading-none tracking-tighter" x-text="vid.title"></h1>
-                    <div class="flex gap-4"><button @click="playVideo(vid)" class="bg-white text-black px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-gray-200 transition-all text-xl shadow-2xl"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> PLAY NOW</button><button @click="openDetails(vid)" class="bg-white/10 text-white px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-white/20 transition-all backdrop-blur-xl text-xl border border-white/10"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> DETAILS</button></div>
+                    <div class="flex flex-wrap gap-4"><button @click="playVideo(vid)" class="bg-white text-black px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-gray-200 transition-all text-xl shadow-2xl"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> PLAY NOW</button><button @click="openDetails(vid)" class="bg-white/10 text-white px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-white/20 transition-all backdrop-blur-xl text-xl border border-white/10"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> DETAILS</button></div>
                 </div>
             </div>
         </template>
-        <div class="absolute bottom-10 right-10 flex gap-2 z-40">
-            <template x-for="(v, i) in featuredList" :key="i"><div class="h-1 rounded-full transition-all duration-500" :class="heroIndex === i ? 'w-12 bg-red-600' : 'w-4 bg-white/20'"></div></template>
-        </div>
+        <div class="absolute inset-y-0 left-0 flex items-center px-4 z-40"><button @click="heroIndex = (heroIndex - 1 + featuredList.length) % featuredList.length" class="p-4 rounded-full bg-black/20 hover:bg-black/50 backdrop-blur-md transition-all"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg></button></div>
+        <div class="absolute inset-y-0 right-0 flex items-center px-4 z-40"><button @click="heroIndex = (heroIndex + 1) % featuredList.length" class="p-4 rounded-full bg-black/20 hover:bg-black/50 backdrop-blur-md transition-all"><svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg></button></div>
     </section>
 
     <!-- ── Video Lists ── -->
-    <main class="relative z-10 pb-32 px-10 space-y-24" :class="searchQuery || showOnlyFavorites ? 'mt-32' : (featuredList.length > 0 ? '-mt-20' : 'mt-32')">
-        
-        <template x-if="sections.length === 0">
-            <div class="flex flex-col items-center justify-center py-40 space-y-8 opacity-20">
-                <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                <p class="text-2xl font-black tracking-widest uppercase">No media found in library</p>
-            </div>
-        </template>
-
+    <main class="relative z-10 pb-32 px-4 md:px-10 space-y-24" :class="searchQuery || showOnlyFavorites ? 'mt-32' : (featuredList.length > 0 ? '-mt-20' : 'mt-32')">
         <template x-for="section in filteredSections" :key="section.slug">
             <div class="space-y-6 fade-in">
                 <div class="flex items-center gap-6 px-4">
@@ -94,13 +84,13 @@
                 </div>
                 <div class="flex overflow-x-auto gap-8 pb-10 px-4 no-scrollbar scroll-smooth">
                     <template x-for="vid in section.videos" :key="vid.id">
-                        <div class="flex-none w-80 group relative">
+                        <div class="flex-none w-72 md:w-80 group relative">
                             <div class="aspect-video rounded-3xl overflow-hidden bg-[#141414] shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:z-30 cursor-pointer" @click="playVideo(vid)">
                                 <img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover" loading="lazy">
                                 <button @click.stop="toggleFavorite(vid.id)" class="absolute top-4 right-4 z-40 p-2 rounded-full backdrop-blur-md transition-all hover:scale-110" :class="isFavorite(vid.id) ? 'bg-red-600 text-white' : 'bg-black/40 text-white/40 hover:text-white'"><svg class="w-5 h-5" :fill="isFavorite(vid.id) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></button>
                                 <div class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6"><button @click.stop="playVideo(vid)" class="bg-white text-black p-4 rounded-full hover:scale-110 transition-all shadow-2xl"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><button @click.stop="openDetails(vid)" class="bg-white/10 text-white p-4 rounded-full hover:scale-110 transition-all backdrop-blur-xl border border-white/20"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button></div>
                             </div>
-                            <h3 class="mt-4 font-bold text-gray-500 group-hover:text-white transition-colors px-4 text-sm" x-text="vid.title"></h3>
+                            <h3 class="mt-4 font-bold text-gray-500 group-hover:text-white transition-colors px-4 text-sm line-clamp-1" x-text="vid.title"></h3>
                         </div>
                     </template>
                 </div>
@@ -108,41 +98,52 @@
         </template>
     </main>
 
-    <!-- Modal Details -->
-    <div x-show="showModal" class="fixed inset-0 z-[600] flex items-center justify-center p-10 bg-black/90 backdrop-blur-xl" x-cloak x-transition.opacity>
-        <div class="bg-[#111] w-full max-w-6xl max-h-[90vh] rounded-[40px] overflow-hidden shadow-2xl border border-white/5 relative flex no-scrollbar" @click.away="showModal = false">
-            <div class="w-3/5 relative bg-black"><img :src="detailVideo ? '/api/thumb/' + detailVideo.id : ''" class="w-full h-full object-cover opacity-60"><div class="absolute inset-0 bg-gradient-to-r from-[#111] via-transparent to-transparent"></div><button @click="playVideo(detailVideo)" class="absolute bottom-12 left-12 bg-red-600 px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-red-700 shadow-2xl shadow-red-600/30"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> WATCH NOW</button></div>
-            <div class="w-2/5 p-16 space-y-12 overflow-y-auto"><button @click="showModal = false" class="absolute top-8 right-8 p-3 bg-white/5 hover:bg-white/10 rounded-full transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div><h2 class="text-5xl font-black mb-6 leading-tight tracking-tighter" x-text="detailVideo?.title"></h2><div class="flex gap-4 text-[10px] font-black text-white/30 tracking-[0.3em] uppercase"><span x-text="detailVideo?.format"></span><span x-text="detailVideo?.size"></span></div></div><div class="space-y-6"><button @click="openInExplorer(detailVideo?.id)" class="w-full bg-white text-black py-6 rounded-3xl font-black flex items-center justify-center gap-4 hover:bg-gray-200 transition-all shadow-xl"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> OPEN IN EXPLORER</button></div></div>
-        </div>
-    </div>
-
-    <!-- Modals (Sync, Shutdown) -->
-    <template x-if="showSyncInfo">
-        <div class="fixed inset-0 z-[700] flex items-center justify-center p-6 bg-black/95 backdrop-blur-3xl" x-transition.opacity>
-            <div class="bg-[#181818] p-12 rounded-[50px] max-w-md w-full text-center space-y-8 border border-white/10 shadow-2xl">
-                <h3 class="text-3xl font-black">Under Development</h3>
-                <p class="text-gray-400 text-sm">Automatic sync is being improved. To update your library, **shutdown the hub and open SPMH.exe again.**</p>
-                <button @click="showSyncInfo = false" class="w-full bg-white text-black py-5 rounded-2xl font-black uppercase">Got it</button>
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-white/5 py-10 opacity-30 hover:opacity-100 transition-opacity">
+        <div class="max-w-[1800px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold uppercase tracking-[0.2em]">
+            <div class="flex items-center gap-4">
+                <span>SPMH Version 1.4.0</span>
+                <span class="w-1 h-1 bg-white/20 rounded-full"></span>
+                <span>Project by <span class="text-red-600">Okonam</span></span>
             </div>
+            <a href="https://github.com/okonam/spmh" target="_blank" class="flex items-center gap-2 hover:text-red-600 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                View on GitHub
+            </a>
         </div>
-    </template>
-
-    <template x-if="showShutdown">
-        <div class="fixed inset-0 z-[700] flex items-center justify-center p-6 bg-black/98 backdrop-blur-3xl" x-transition.opacity>
-            <div class="bg-[#151515] p-16 rounded-[50px] max-w-md w-full text-center space-y-10 border border-white/10 shadow-2xl">
-                <h3 class="text-4xl font-black">Shutdown Hub?</h3>
-                <div class="flex flex-col gap-4"><button @click="confirmShutdown()" class="bg-red-600 text-white py-6 rounded-3xl font-black uppercase">Shutdown Now</button><button @click="showShutdown = false" class="bg-white/5 text-white py-6 rounded-3xl font-bold uppercase">Cancel</button></div>
-            </div>
-        </div>
-    </template>
+    </footer>
 
     <!-- Player -->
-    <div x-show="playing" class="fixed inset-0 z-[1000] bg-black group" x-cloak x-transition.opacity>
+    <div x-show="playing" class="fixed inset-0 z-[1000] bg-black group" x-cloak x-transition.opacity @contextmenu.prevent="showRightClickHint = true">
         <video x-ref="player" :src="currentVideo ? '/api/stream/' + currentVideo.id : ''" class="w-full h-full object-contain" @timeupdate="updateProgress()" @ended="closePlayer()"></video>
+        
+        <!-- Right Click Hint Modal (Fixed Z-INDEX) -->
+        <div x-show="showRightClickHint" x-transition.opacity class="fixed inset-0 z-[2000] bg-black/90 flex items-center justify-center p-6 text-center" @click="showRightClickHint = false">
+            <div class="bg-white/10 backdrop-blur-3xl p-10 rounded-[40px] border border-white/20 max-w-sm space-y-6 shadow-2xl"><svg class="w-20 h-20 mx-auto text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg><h3 class="text-2xl font-black tracking-tighter uppercase">Premium Controls</h3><p class="text-white/60 text-sm">Right-click the player anytime to access subtitles, multi-audio tracks, and advanced playback settings.</p><button @click="showRightClickHint = false" class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase text-xs">Close Tips</button></div>
+        </div>
+
         <div class="absolute inset-0 z-[1010] flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            <div class="p-10 flex justify-between items-center pointer-events-auto bg-gradient-to-b from-black/80 to-transparent"><button @click="closePlayer()" class="p-4 bg-white/5 hover:bg-white/20 rounded-full backdrop-blur-md transition-all"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg></button><h2 class="text-2xl font-black uppercase tracking-widest" x-text="currentVideo?.title"></h2><button @click="setSpeed(playbackRate === 2 ? 1 : playbackRate + 0.5)" class="px-6 py-3 bg-white/5 rounded-xl border border-white/10 text-xs font-black pointer-events-auto">SPEED: <span x-text="playbackRate + 'x'"></span></button></div>
-            <div class="flex items-center justify-center gap-16 pointer-events-auto"><button @click="skip(-15)" class="p-6 bg-white/5 hover:bg-white/15 rounded-full"><svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button><button @click="togglePlay()" class="p-10 bg-white text-black rounded-full hover:scale-110 shadow-2xl"><template x-if="videoPaused"><svg class="w-16 h-16 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></template><template x-if="!videoPaused"><svg class="w-16 h-16 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></template></button><button @click="skip(15)" class="p-6 bg-white/5 hover:bg-white/15 rounded-full"><svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12.5 8c4.65 0 8.58 3.03 9.96 7.22l-2.37.78c-1.05-3.19-4.06-5.5-7.6-5.5-1.96 0-3.73.72-5.12 1.88L11 16H2V7l3.6 3.6C7.45 9 9.85 8 12.5 8z"/></svg></button></div>
-            <div class="p-10 space-y-6 pointer-events-auto bg-gradient-to-t from-black/90 to-transparent"><div class="flex items-center justify-between text-[10px] font-black text-white/60"><span x-text="formatTime(currentTime)"></span><span x-text="formatTime(duration)"></span></div><div class="relative h-2 bg-white/10 rounded-full cursor-pointer group/bar" @click="seek($event)"><div class="absolute inset-y-0 left-0 bg-red-600 rounded-full transition-all duration-100" :style="'width: ' + progress + '%'"></div></div></div>
+            <div class="p-6 md:p-10 flex justify-between items-center pointer-events-auto bg-gradient-to-b from-black/80 to-transparent">
+                <button @click="closePlayer()" class="p-4 bg-white/5 hover:bg-white/20 rounded-full backdrop-blur-md transition-all"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg></button>
+                <h2 class="text-lg md:text-2xl font-black uppercase tracking-widest line-clamp-1" x-text="currentVideo?.title"></h2>
+                <div class="flex items-center gap-6 pointer-events-auto">
+                    <!-- Volume Control -->
+                    <div class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10 group/volume">
+                        <button @click="toggleMute()" class="text-white/60 hover:text-white transition-colors">
+                            <template x-if="isMuted || volume == 0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg></template>
+                            <template x-if="!isMuted && volume > 0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg></template>
+                        </button>
+                        <input type="range" min="0" max="1" step="0.01" x-model="volume" @input="updateVolume()" class="w-0 group-hover/volume:w-24 transition-all duration-500 h-1 bg-white/10 rounded-full appearance-none">
+                    </div>
+                    <button @click="setSpeed(playbackRate === 2 ? 1 : playbackRate + 0.5)" class="px-4 py-3 bg-white/5 rounded-2xl border border-white/10 text-[10px] md:text-xs font-black uppercase tracking-tighter">SPEED: <span x-text="playbackRate + 'x'"></span></button>
+                </div>
+            </div>
+            <div class="flex items-center justify-center gap-8 md:gap-16 pointer-events-auto">
+                <button @click="skip(-15)" class="p-4 md:p-6 bg-white/5 hover:bg-white/15 rounded-full transition-all hover:scale-110"><svg class="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button>
+                <button @click="togglePlay()" class="p-8 md:p-10 bg-white text-black rounded-full hover:scale-110 shadow-2xl transition-all"><template x-if="videoPaused"><svg class="w-12 h-12 md:w-16 md:h-16 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></template><template x-if="!videoPaused"><svg class="w-12 h-12 md:w-16 md:h-16 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></template></button>
+                <button @click="skip(15)" class="p-4 md:p-6 bg-white/5 hover:bg-white/15 rounded-full transition-all hover:scale-110"><svg class="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M11.5 8c2.65 0 5.05 1 6.9 2.6L22 7v9h-9l3.62-3.62c-1.39-1.16-3.16-1.88-5.12-1.88-3.54 0-6.55 2.31-7.6 5.5l-2.37-.78C2.92 11.03 6.85 8 11.5 8z"/></svg></button>
+            </div>
+            <div class="p-6 md:p-10 space-y-4 md:space-y-6 pointer-events-auto bg-gradient-to-t from-black/90 to-transparent"><div class="flex items-center justify-between text-[10px] font-black text-white/60 uppercase tracking-widest"><span x-text="formatTime(currentTime)"></span><span x-text="formatTime(duration)"></span></div><div class="relative h-2 bg-white/10 rounded-full cursor-pointer group/bar" @click="seek($event)"><div class="absolute inset-y-0 left-0 bg-red-600 rounded-full transition-all duration-100" :style="'width: ' + progress + '%'"></div></div></div>
         </div>
     </div>
 
@@ -150,14 +151,15 @@
         function hubApp() {
             return {
                 sections: [], featuredList: [], heroIndex: 0, detailVideo: null, currentVideo: null,
-                scrolled: false, playing: false, showModal: false, showIntro: false, showShutdown: false, showSyncInfo: false,
+                scrolled: false, playing: false, showModal: false, showIntro: false, showShutdown: false, showRightClickHint: false,
                 videoPaused: false, playbackRate: 1, progress: 0, currentTime: 0, duration: 0, searchQuery: '',
                 favorites: JSON.parse(localStorage.getItem('spmh_favorites') || '[]'),
                 showOnlyFavorites: false,
+                volume: 1, isMuted: false, lastVolume: 1,
 
                 async init() {
                     await this.fetchData();
-                    setInterval(() => { if(!this.showModal && !this.playing && !this.searchQuery && !this.showOnlyFavorites) this.nextHero(); }, 12000);
+                    setInterval(() => { if(!this.showModal && !this.playing && !this.searchQuery && !this.showOnlyFavorites) this.heroIndex = (this.heroIndex + 1) % this.featuredList.length; }, 10000);
                 },
 
                 get filteredSections() {
@@ -182,29 +184,38 @@
                         const res = await fetch('/api/hub');
                         const data = await res.json();
                         this.sections = data.sections;
-                        if (this.featuredList.length === 0) this.shuffleHero();
-                    } catch (e) { console.error("API Fetch Error:", e); }
+                        this.shuffleHero();
+                    } catch (e) { console.error("Fetch Error:", e); }
                 },
 
                 shuffleHero() { const all = this.sections.flatMap(s => s.videos); if (all.length > 0) this.featuredList = all.sort(() => 0.5 - Math.random()).slice(0, 5); },
-                nextHero() { if(this.featuredList.length > 0) this.heroIndex = (this.heroIndex + 1) % this.featuredList.length },
                 openDetails(video) { this.detailVideo = video; this.showModal = true; },
-                closeAll() { this.showModal = false; this.closePlayer(); this.showShutdown = false; this.showSyncInfo = false; },
+                closeAll() { this.showModal = false; this.closePlayer(); this.showShutdown = false; this.showRightClickHint = false; },
                 async playVideo(video) {
                     if(!video) return;
                     this.currentVideo = video; this.showIntro = true;
                     setTimeout(() => {
-                        this.showIntro = false; this.playing = true; this.videoPaused = false; this.playbackRate = 1; 
-                        this.$nextTick(() => { this.$refs.player.play(); });
-                    }, 1500);
+                        this.showIntro = false; this.playing = true; this.videoPaused = false; this.playbackRate = 1; this.showRightClickHint = false;
+                        this.$nextTick(() => { 
+                            this.$refs.player.src = '/api/stream/' + video.id; 
+                            this.$refs.player.volume = this.volume;
+                            this.$refs.player.play(); 
+                        });
+                    }, 1200);
                 },
-                async closePlayer() { if (this.$refs.player) { this.$refs.player.pause(); this.$refs.player.src = ""; } this.playing = false; },
+                async closePlayer() { if (this.$refs.player) { this.$refs.player.pause(); this.$refs.player.src = ""; } this.playing = false; this.currentVideo = null; },
                 togglePlay() { if (this.$refs.player.paused) { this.$refs.player.play(); this.videoPaused = false; } else { this.$refs.player.pause(); this.videoPaused = true; } },
                 updateProgress() { const p = this.$refs.player; if (p) { this.currentTime = p.currentTime; this.duration = p.duration; this.progress = (p.currentTime / p.duration) * 100; } },
                 seek(e) { const bar = e.currentTarget; const rect = bar.getBoundingClientRect(); const pos = (e.clientX - rect.left) / rect.width; this.$refs.player.currentTime = pos * this.$refs.player.duration; },
                 formatTime(sec) { if (isNaN(sec)) return "00:00"; const m = Math.floor(sec / 60); const s = Math.floor(sec % 60); return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`; },
                 skip(sec) { this.$refs.player.currentTime += sec; },
                 setSpeed(rate) { this.playbackRate = rate; this.$refs.player.playbackRate = rate; },
+                updateVolume() { this.$refs.player.volume = this.volume; if (this.volume > 0) this.isMuted = false; },
+                toggleMute() { 
+                    if (this.isMuted) { this.volume = this.lastVolume; this.isMuted = false; } 
+                    else { this.lastVolume = this.volume; this.volume = 0; this.isMuted = true; }
+                    this.$refs.player.volume = this.volume;
+                },
                 async openInExplorer(id) { if(id) await fetch(`/api/open/${id}`, { method: 'POST' }); },
                 async confirmShutdown() { try { await fetch('/api/stop', { method: 'POST' }); } catch (e) {} window.close(); }
             }
