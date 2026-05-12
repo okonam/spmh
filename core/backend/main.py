@@ -32,6 +32,14 @@ for parent in current_file.parents:
 
 # The user wants to scan "behind" (parent of) the hub folder
 VIDEO_ROOT = project_folder.parent
+
+# PORTABLE ENHANCEMENT: If we are inside an "Agente" or "projects" folder structure, 
+# we go up to the parent of those folders to ensure we scan the user's main media root.
+for parent in current_file.parents:
+    if parent.name.lower() in ["agente", "projects"]:
+        VIDEO_ROOT = parent.parent
+        break
+
 CORE_DIR = project_folder / "core"
 THUMB_DIR = CORE_DIR / "data" / "thumbs"
 VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v"}
@@ -55,113 +63,172 @@ LIBRARY_STATE = {
     "sections": [],
     "is_scanning": False,
     "total_videos": 0,
-    "last_update": None
+    "last_update": None,
+    "scan_log": []
 }
+
+VIDEO_PATH_CACHE = {} # Fast lookup for ID -> Path
 
 def get_id(path_str):
     return hashlib.md5(path_str.encode()).hexdigest()
 
 def format_video_data(path: Path, vid_id: str):
-    stats = path.stat()
-    size_gb = stats.st_size / (1024**3)
-    return {
-        "id": vid_id,
-        "title": path.stem.replace(".", " ").replace("_", " ").title(),
-        "path": str(path),
-        "size": f"{size_gb:.2f} GB",
-        "modified": stats.st_mtime,
-        "format": path.suffix.upper()[1:],
-        "duration": "N/A"
-    }
+    try:
+        stats = path.stat()
+        size_gb = stats.st_size / (1024**3)
+        VIDEO_PATH_CACHE[vid_id] = str(path)
+        return {
+            "id": vid_id,
+            "title": path.stem.replace(".", " ").replace("_", " ").title(),
+            "path": str(path),
+            "size": f"{size_gb:.2f} GB",
+            "modified": stats.st_mtime,
+            "format": path.suffix.upper()[1:],
+            "duration": "N/A"
+        }
+    except:
+        return None
+
+def log_scan(msg):
+    global LIBRARY_STATE
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    full_msg = f"[{timestamp}] {msg}"
+    print(full_msg)
+    LIBRARY_STATE["scan_log"].append(full_msg)
+    if len(LIBRARY_STATE["scan_log"]) > 100:
+        LIBRARY_STATE["scan_log"].pop(0)
 
 def background_scanner():
-    global LIBRARY_STATE
+    global LIBRARY_STATE, VIDEO_PATH_CACHE
     LIBRARY_STATE["is_scanning"] = True
     LIBRARY_STATE["total_videos"] = 0
     LIBRARY_STATE["sections"] = []
+    LIBRARY_STATE["scan_log"] = []
+    VIDEO_PATH_CACHE = {} # Reset on new scan
     
-    # Resolve paths once to avoid comparison issues
+    # Resolve paths once
     abs_project = project_folder.resolve()
     abs_root = VIDEO_ROOT.resolve()
+    abs_core = (project_folder / "core").resolve()
     
-    print(f"\n[SCAN] Deep scanning library at: {abs_root}")
-    print(f"[SCAN] Project path: {abs_project}")
+    # Precise folders to skip (absolute paths)
+    SYSTEM_PATHS = {
+        abs_project,
+        abs_core,
+        (abs_core / "data").resolve(),
+        (abs_core / "frontend").resolve(),
+        (abs_core / "backend").resolve()
+    }
+    
+    log_scan(f"Starting scan at: {abs_root}")
+    log_scan(f"Project path: {abs_project}")
     
     try:
-        # 1. Root Scan (Files in the same level as the Hub folder)
+        # 1. Root Scan
         root_videos = []
         try:
-            for item in abs_root.iterdir():
-                if item.is_file() and item.suffix.lower() in VIDEO_EXTENSIONS:
-                    vid_id = get_id(str(item))
-                    root_videos.append(format_video_data(item, vid_id))
-                    LIBRARY_STATE["total_videos"] += 1
-                    print(f" -> Found in root: {item.name}")
+            it = abs_root.iterdir()
+            while True:
+                try:
+                    item = next(it)
+                    if item.is_file() and item.suffix.lower() in VIDEO_EXTENSIONS:
+                        vid_id = get_id(str(item.resolve()))
+                        vdata = format_video_data(item, vid_id)
+                        if vdata:
+                            root_videos.append(vdata)
+                            LIBRARY_STATE["total_videos"] += 1
+                except StopIteration:
+                    break
+                except Exception as e:
+                    continue
+            log_scan(f"Found {len(root_videos)} videos in root.")
         except Exception as e:
-            print(f"[WARN] Error scanning root files: {e}")
+            log_scan(f"Error scanning root: {e}")
         
         if root_videos:
             update_section("Root Files", "root-files", root_videos)
         
-        # 2. Folder Scan (Subfolders in the parent directory)
-        # We collect entries first to avoid issues with changing directory state
+        # 2. Folder Scan
         entries = []
         try:
-            entries = sorted(list(abs_root.iterdir()))
+            it = abs_root.iterdir()
+            while True:
+                try:
+                    entry = next(it)
+                    entries.append(entry)
+                except StopIteration:
+                    break
+                except:
+                    continue
+            entries.sort()
         except Exception as e:
-            print(f"[ERROR] Could not list root directory: {e}")
+            log_scan(f"Could not list root directory: {e}")
             return
 
         for entry in entries:
             try:
-                # Skip if not a directory
-                if not entry.is_dir():
+                # Basic checks
+                if not entry.is_dir(): continue
+                if entry.name.startswith("."): continue
+                
+                # Path-based skip
+                try:
+                    entry_abs = entry.resolve()
+                except:
+                    log_scan(f"Could not resolve path for {entry.name}, skipping.")
+                    continue
+
+                if entry_abs in SYSTEM_PATHS or entry_abs == abs_project:
+                    log_scan(f"Skipping system folder: {entry.name}")
                     continue
                 
-                # Skip project folder itself by path, not just name
-                if entry.resolve() == abs_project:
-                    print(f"[SCAN] Skipping project folder: {entry.name}")
-                    continue
-                
-                # Skip hidden folders or known system folders
-                if entry.name.startswith(".") or entry.name in SKIP_DIRS:
+                # Check for generic skip names
+                if entry.name in {"node_modules", "venv", ".git", "__pycache__"}:
+                    log_scan(f"Skipping dependency/temp folder: {entry.name}")
                     continue
                     
                 videos = []
-                print(f"[SCAN] Checking folder: {entry.name}")
+                log_scan(f"Scanning folder: {entry.name}")
                 
                 for root, dirs, files in os.walk(entry):
-                    # Prune dirs in-place to avoid system/hidden folders
-                    dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith(".")]
+                    current_root_abs = Path(root).resolve()
                     
-                    # Check if this subfolder is the project folder (safety check)
-                    if Path(root).resolve() == abs_project:
-                        dirs[:] = [] # Stop recursion here
+                    # Safety: skip if we somehow walked into the project folder
+                    if current_root_abs == abs_project or current_root_abs in SYSTEM_PATHS:
+                        dirs[:] = []
                         continue
+                        
+                    # Prune hidden dirs
+                    dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"node_modules", "venv", ".git"}]
 
                     for file in files:
                         file_path = Path(root) / file
                         if file_path.suffix.lower() in VIDEO_EXTENSIONS:
-                            vid_id = get_id(str(file_path))
+                            vid_id = get_id(str(file_path.resolve()))
                             videos.append(format_video_data(file_path, vid_id))
                             LIBRARY_STATE["total_videos"] += 1
-                            # print(f"   + {file}") # Excessive logging
                 
                 if videos:
-                    print(f" -> Found {len(videos)} videos in {entry.name}")
-                    update_section(entry.name.replace("_", " ").title(), get_id(str(entry)), videos)
+                    log_scan(f" -> Found {len(videos)} videos in '{entry.name}'")
+                    update_section(entry.name.replace("_", " ").title(), get_id(str(entry_abs)), videos)
+                else:
+                    log_scan(f" -> No videos found in '{entry.name}' (recursive search)")
+
             except Exception as e:
-                print(f"[WARN] Failed to scan folder {entry.name}: {e}")
+                log_scan(f"Error scanning '{entry.name}': {e}")
                 
     except Exception as e:
-        print(f"[ERROR] Global scan failed: {e}")
+        log_scan(f"Global scan error: {e}")
     finally:
         LIBRARY_STATE["is_scanning"] = False
         LIBRARY_STATE["last_update"] = datetime.now().isoformat()
-        print(f"[OK] Scan complete. Total: {LIBRARY_STATE['total_videos']} videos found.\n")
+        log_scan(f"Scan complete. Total: {LIBRARY_STATE['total_videos']} videos.")
 
 def update_section(name, slug, videos):
     global LIBRARY_STATE
+    # Prevent duplicate sections by slug
+    if any(s["slug"] == slug for s in LIBRARY_STATE["sections"]):
+        return
     LIBRARY_STATE["sections"].append({
         "name": name,
         "slug": slug,
@@ -178,7 +245,8 @@ def get_hub():
         "title": "SPMH - Portable Media Hub",
         "sections": LIBRARY_STATE["sections"],
         "is_scanning": LIBRARY_STATE["is_scanning"],
-        "total": LIBRARY_STATE["total_videos"]
+        "total": LIBRARY_STATE["total_videos"],
+        "scan_log": LIBRARY_STATE["scan_log"]
     }
 
 @app.get("/api/thumb/{video_id}")
@@ -186,11 +254,12 @@ def get_thumb(video_id: str):
     thumb_path = THUMB_DIR / f"{video_id}.jpg"
     if thumb_path.exists(): return FileResponse(thumb_path)
     
-    video_path = None
-    for sec in LIBRARY_STATE["sections"]:
-        for v in sec["videos"]:
-            if v["id"] == video_id:
-                video_path = v["path"]; break
+    video_path = VIDEO_PATH_CACHE.get(video_id)
+    if not video_path:
+        for sec in LIBRARY_STATE["sections"]:
+            for v in sec["videos"]:
+                if v["id"] == video_id:
+                    video_path = v["path"]; break
     
     if video_path and os.path.exists(video_path):
         try:
@@ -202,11 +271,13 @@ def get_thumb(video_id: str):
 
 @app.get("/api/stream/{video_id}")
 async def stream_video(video_id: str):
-    video_path = None
-    for sec in LIBRARY_STATE["sections"]:
-        for v in sec["videos"]:
-            if v["id"] == video_id:
-                video_path = v["path"]; break
+    video_path = VIDEO_PATH_CACHE.get(video_id)
+    if not video_path:
+        for sec in LIBRARY_STATE["sections"]:
+            for v in sec["videos"]:
+                if v["id"] == video_id:
+                    video_path = v["path"]; break
+    
     if not video_path: raise HTTPException(404)
     return FileResponse(video_path)
 
