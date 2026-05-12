@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# SPMH Data
+core/data/thumbs/*
+!core/data/thumbs/.gitkeep
+
+# System
+.DS_Store
+Thumbs.db
+*.log
+
+# IDEs
+.vscode/
+.idea/
+.gemini/

@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+# ffmpeg should be installed on the system, but we can bundle it later
