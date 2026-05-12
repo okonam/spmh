@@ -1,26 +1,17 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace SPMH_Launcher
 {
     class Program
     {
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
-
         static void Main(string[] args)
         {
             Console.Title = "SPMH — Self Portable Media Hub";
-            string corePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "core");
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string corePath = Path.Combine(baseDir, "core");
             string mainPy = Path.Combine(corePath, "backend", "main.py");
 
             Console.WriteLine("====================================================");
@@ -31,6 +22,7 @@ namespace SPMH_Launcher
             if (!File.Exists(mainPy))
             {
                 Console.WriteLine("[ERROR] Engine core not found at: " + mainPy);
+                Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
                 return;
             }
@@ -43,7 +35,7 @@ namespace SPMH_Launcher
                 Process.Start(killPort).WaitForExit();
             } catch {}
 
-            // 2. Start Python directly in this console or a visible window
+            // 2. Start Python
             ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = "python"; 
             psi.Arguments = "-u \"" + mainPy + "\"";
@@ -52,14 +44,16 @@ namespace SPMH_Launcher
             
             try {
                 Process p = Process.Start(psi);
-                Console.WriteLine("[OK] Engine started (PID: " + p.Id + ")");
-                Console.WriteLine("[>] Launching Portal in 3s...");
-                
-                Thread.Sleep(3000);
-                Process.Start("http://127.0.0.1:8888");
-                
-                // Keep the console alive to show TIPS from main.py
-                p.WaitForExit();
+                if (p != null) {
+                    Console.WriteLine("[OK] Engine started (PID: " + p.Id + ")");
+                    Console.WriteLine("[>] Launching Portal in 3s...");
+                    
+                    Thread.Sleep(3000);
+                    Process.Start("http://127.0.0.1:8888");
+                    
+                    // Keep open to show TIPS
+                    p.WaitForExit();
+                }
             }
             catch (Exception ex) {
                 Console.WriteLine("[CRITICAL ERROR] Could not start Python: " + ex.Message);
