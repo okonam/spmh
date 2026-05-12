@@ -15,17 +15,17 @@ namespace SPMH_Setup
 
         public SetupForm()
         {
-            this.Text = "SPMH — Instalador de Dependências";
+            this.Text = "SPMH — Dependency Installer";
             this.Size = new Size(500, 400);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(15, 15, 15);
             this.ForeColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
 
-            lblStatus = new Label() { Text = "Clique para iniciar a preparação do ambiente", Location = new Point(20, 20), Size = new Size(440, 30), Font = new Font("Segoe UI", 10, FontStyle.Bold) };
+            lblStatus = new Label() { Text = "Click to start environment preparation", Location = new Point(20, 20), Size = new Size(440, 30), Font = new Font("Segoe UI", 10, FontStyle.Bold) };
             txtLog = new TextBox() { Multiline = true, ReadOnly = true, Location = new Point(20, 60), Size = new Size(440, 200), BackColor = Color.Black, ForeColor = Color.Lime, Font = new Font("Consolas", 8), ScrollBars = ScrollBars.Vertical };
             pBar = new ProgressBar() { Location = new Point(20, 270), Size = new Size(440, 20) };
-            btnStart = new Button() { Text = "INSTALAR TUDO AGORA", Location = new Point(20, 300), Size = new Size(440, 40), BackColor = Color.FromArgb(0, 120, 215), FlatStyle = FlatStyle.Flat };
+            btnStart = new Button() { Text = "INSTALL EVERYTHING NOW", Location = new Point(20, 300), Size = new Size(440, 40), BackColor = Color.FromArgb(0, 120, 215), FlatStyle = FlatStyle.Flat };
             
             btnStart.Click += (s, e) => RunInstall();
 
@@ -38,25 +38,25 @@ namespace SPMH_Setup
         private async void RunInstall()
         {
             btnStart.Enabled = false;
-            txtLog.AppendText("Iniciando instalação...\r\n");
+            txtLog.AppendText("Starting installation...\r\n");
             
-            // 1. Instalar Python via Winget
-            UpdateStatus("Verificando Python 3.12...", 20);
+            // 1. Install Python via Winget
+            UpdateStatus("Checking Python 3.12...", 20);
             RunCommand("winget install Python.Python.3.12 --silent --accept-package-agreements --accept-source-agreements");
 
-            // 2. Instalar FFmpeg via Winget
-            UpdateStatus("Verificando FFmpeg...", 50);
+            // 2. Install FFmpeg via Winget
+            UpdateStatus("Checking FFmpeg...", 50);
             RunCommand("winget install Gyan.FFmpeg --silent --accept-package-agreements --accept-source-agreements");
 
-            // 3. Instalar Bibliotecas Python
-            UpdateStatus("Instalando bibliotecas do Hub...", 80);
+            // 3. Install Python Libs
+            UpdateStatus("Installing Hub libraries...", 80);
             string reqPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "core", "backend", "requirements.txt");
             RunCommand("python -m pip install -r \"" + reqPath + "\" --upgrade");
 
-            UpdateStatus("Tudo pronto! Você já pode abrir o SPMH.exe", 100);
-            MessageBox.Show("Dependências instaladas com sucesso!", "SPMH Setup");
+            UpdateStatus("All set! You can now open SPMH.exe", 100);
+            MessageBox.Show("Dependencies installed successfully!", "SPMH Setup");
             btnStart.Enabled = true;
-            btnStart.Text = "FECHAR INSTALADOR";
+            btnStart.Text = "CLOSE INSTALLER";
             btnStart.Click += (s, e) => Application.Exit();
         }
 

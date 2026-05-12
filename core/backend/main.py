@@ -213,5 +213,33 @@ if FRONTEND_DIR.exists():
 
 if __name__ == "__main__":
     import uvicorn
-    print("[!] Starting Uvicorn at 0.0.0.0:8888")
-    uvicorn.run(app, host="0.0.0.0", port=8888, log_level="info")
+    
+    # Tips System for the Console
+    TIPS = [
+        "TIP: Use the search bar to quickly find any movie in your library.",
+        "TIP: Right-click the player for audio and subtitle options.",
+        "TIP: Click the heart icon to save movies to your Favorites list.",
+        "TIP: The Hero section features a cinematic live preview of your movies.",
+        "TIP: Shutdown the hub using the Power icon to safely close all processes.",
+        "TIP: SPMH is zero-config. Just drop movies in folders and they will appear here.",
+        "TIP: Press ESC to quickly close any open modal or the video player."
+    ]
+    
+    def console_tips():
+        i = 0
+        while True:
+            # Clear console effect (simplified)
+            print(f"\n[SPMH ACTIVE] {TIPS[i % len(TIPS)]}")
+            i += 1
+            time.sleep(15)
+
+    threading.Thread(target=console_tips, daemon=True).start()
+    
+    print("\n" + "="*50)
+    print("      SELF PORTABLE MEDIA HUB - BY OKONAM")
+    print("="*50)
+    print(" -> Access the portal at: http://localhost:8888")
+    print(" -> Keep this window open while using the Hub.")
+    print("="*50 + "\n")
+    
+    uvicorn.run(app, host="0.0.0.0", port=8888, log_level="critical")

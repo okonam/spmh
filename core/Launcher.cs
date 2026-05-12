@@ -29,14 +29,14 @@ namespace SPMH_Launcher
             if (!Directory.Exists(DataPath)) Directory.CreateDirectory(DataPath);
             File.WriteAllText(DebugLog, "=== SPMH DEBUG SESSION " + DateTime.Now + " ===\r\n");
 
-            this.Text = "SPMH — Debug Mode";
+            this.Text = "SPMH — Boot Manager";
             this.Size = new Size(400, 200);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(15, 15, 15);
             this.ForeColor = Color.White;
 
             lblStatus = new Label() { 
-                Text = "● Modo Debug Ativo...", 
+                Text = "● Engine Starting...", 
                 Location = new Point(20, 40), 
                 Size = new Size(350, 60),
                 Font = new Font("Segoe UI", 10)
@@ -115,8 +115,8 @@ namespace SPMH_Launcher
                     Thread.Sleep(2000);
                 }
                 
-                Log("TIMEOUT: O motor não respondeu após 20 tentativas.");
-                MessageBox.Show("O motor não iniciou.\r\nVeja o log em: core/data/DEBUG_LAUNCHER.log", "SPMH Erro");
+                Log("TIMEOUT: Engine did not respond after 20 attempts.");
+                MessageBox.Show("The engine failed to start.\r\nCheck log at: core/data/DEBUG_LAUNCHER.log", "SPMH Error");
                 Application.Exit();
             } catch (Exception ex) {
                 Log("ERRO GERAL NO LAUNCHER: " + ex.Message);
