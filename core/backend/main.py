@@ -1,5 +1,5 @@
 """
-SPMH — Self Portable Media Hub (Backend v1.0.5)
+SPMH — Self Portable Media Hub (Backend v1.0.6)
 By Okonam - Cinematic Cross-Platform Media Hub
 """
 
@@ -21,21 +21,23 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-# --- FAIL-SAFE PATH DETECTION ---
-# We want to find the root folder of the project (where core/ is located)
+# --- SMART PATH DETECTION ---
+# We find where 'core' is, then we set VIDEO_ROOT to the PARENT of the project folder
 current_file = Path(__file__).resolve()
-# Try to find 'core' folder in parents
-project_root = current_file.parent
+project_folder = current_file.parent
 for parent in current_file.parents:
     if (parent / "core").exists():
-        project_root = parent
+        project_folder = parent
         break
 
-CORE_DIR = project_root / "core"
-VIDEO_ROOT = project_root
+# The user wants to scan "behind" (parent of) the hub folder
+VIDEO_ROOT = project_folder.parent
+CORE_DIR = project_folder / "core"
 THUMB_DIR = CORE_DIR / "data" / "thumbs"
 VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov", ".wmv", ".m4v"}
-SKIP_DIRS = {"core", ".gemini", "node_modules", "venv", ".git", "data", "frontend", "__pycache__"}
+
+# We MUST skip the hub's own folder to avoid scanning source files/thumbs as media
+SKIP_DIRS = {"core", ".gemini", "node_modules", "venv", ".git", "data", "frontend", "__pycache__", project_folder.name}
 
 THUMB_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -78,10 +80,11 @@ def background_scanner():
     LIBRARY_STATE["total_videos"] = 0
     LIBRARY_STATE["sections"] = []
     
-    print(f"\n[SCAN] Deep scanning: {VIDEO_ROOT}")
+    print(f"\n[SCAN] Deep scanning library at: {VIDEO_ROOT}")
+    print(f"[SCAN] Ignoring system folder: {project_folder.name}")
     
     try:
-        # 1. Root Scan
+        # 1. Root Scan (Files in the same level as the Hub folder)
         root_videos = []
         for item in VIDEO_ROOT.iterdir():
             if item.is_file() and item.suffix.lower() in VIDEO_EXTENSIONS:
@@ -93,13 +96,13 @@ def background_scanner():
         if root_videos:
             update_section("Root Files", "root-files", root_videos)
         
-        # 2. Folder Scan
+        # 2. Folder Scan (Subfolders in the parent directory)
         for entry in sorted(VIDEO_ROOT.iterdir()):
-            if entry.is_dir() and entry.name not in SKIP_DIRS and not entry.name.startswith(".") and entry.name != "core":
+            # Only scan directories that are not our own project folder or hidden
+            if entry.is_dir() and entry.name not in SKIP_DIRS and not entry.name.startswith("."):
                 videos = []
                 print(f"[SCAN] Checking folder: {entry.name}")
                 for root, dirs, files in os.walk(entry):
-                    # Filter out skip dirs in-place
                     dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith(".")]
                     for file in files:
                         file_path = Path(root) / file
@@ -116,7 +119,7 @@ def background_scanner():
     finally:
         LIBRARY_STATE["is_scanning"] = False
         LIBRARY_STATE["last_update"] = datetime.now().isoformat()
-        print(f"[OK] Total videos found: {LIBRARY_STATE['total_videos']}")
+        print(f"[OK] Scan complete. Total: {LIBRARY_STATE['total_videos']} videos found.\n")
 
 def update_section(name, slug, videos):
     global LIBRARY_STATE
@@ -224,6 +227,7 @@ if __name__ == "__main__":
     print("="*50)
     print(" -> Access the portal at: http://localhost:8888")
     print(" -> Keep this window open while using the Hub.")
+    print(" -> Scanning media in: " + str(VIDEO_ROOT))
     print("="*50 + "\n")
     
     uvicorn.run(app, host="0.0.0.0", port=8888, log_level="critical")
