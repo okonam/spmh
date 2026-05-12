@@ -1,6 +1,6 @@
 """
-SPMH — Self Portable Media Hub (Backend v2 - Async)
-Instant boot with background scanning.
+SPMH — Self Portable Media Hub (Backend v1.0.2)
+By Okonam - Cinematic Cross-Platform Media Hub
 """
 
 import os
@@ -10,6 +10,7 @@ import random
 import subprocess
 import threading
 import time
+import platform
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
@@ -31,7 +32,6 @@ THUMB_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="SPMH API")
 
-# CORS for local dev
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -60,16 +60,14 @@ def format_video_data(path: Path, vid_id: str):
         "size": f"{size_gb:.2f} GB",
         "modified": stats.st_mtime,
         "format": path.suffix.upper()[1:],
-        "duration": "N/A"  # In a future update, we could use ffprobe here
+        "duration": "N/A"
     }
 
 def background_scanner():
     global LIBRARY_STATE
     LIBRARY_STATE["is_scanning"] = True
     LIBRARY_STATE["total_videos"] = 0
-    LIBRARY_STATE["sections"] = [] # HARD RESET
-    
-    print(f"\n[SCAN] Starting deep scan at: {VIDEO_ROOT}")
+    LIBRARY_STATE["sections"] = []
     
     try:
         # 1. Root Scan
@@ -79,7 +77,6 @@ def background_scanner():
                 vid_id = get_id(str(item))
                 root_videos.append(format_video_data(item, vid_id))
                 LIBRARY_STATE["total_videos"] += 1
-                print(f" -> Found in Root: {item.name}")
         
         if root_videos:
             update_section("Root Files", "root-files", root_videos)
@@ -88,7 +85,6 @@ def background_scanner():
         for entry in sorted(VIDEO_ROOT.iterdir()):
             if entry.is_dir() and entry.name not in SKIP_DIRS and not entry.name.startswith(".") and entry.name != CORE_DIR.name:
                 videos = []
-                print(f"[SCAN] Checking folder: {entry.name}")
                 for root, dirs, files in os.walk(entry):
                     dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith(".")]
                     for file in files:
@@ -97,42 +93,26 @@ def background_scanner():
                             vid_id = get_id(str(file_path))
                             videos.append(format_video_data(file_path, vid_id))
                             LIBRARY_STATE["total_videos"] += 1
-                            print(f"   + {file}")
                 
                 if videos:
                     update_section(entry.name.replace("_", " ").title(), get_id(str(entry)), videos)
     except Exception as e:
-        print(f"Scan Error: {e}")
+        print(f"[ERROR] Scan failed: {e}")
     finally:
         LIBRARY_STATE["is_scanning"] = False
         LIBRARY_STATE["last_update"] = datetime.now().isoformat()
-        print(f"[OK] Scan complete. Total: {LIBRARY_STATE['total_videos']} videos.\n")
 
 def update_section(name, slug, videos):
-    """Updates or adds a section in the library."""
     global LIBRARY_STATE
-    # Prevent duplicate sections
-    existing = next((s for s in LIBRARY_STATE["sections"] if s["slug"] == slug), None)
-    if existing:
-        existing["videos"] = sorted(videos, key=lambda v: v["modified"], reverse=True)
-    else:
-        LIBRARY_STATE["sections"].append({
-            "name": name,
-            "slug": slug,
-            "videos": sorted(videos, key=lambda v: v["modified"], reverse=True)
-        })
+    LIBRARY_STATE["sections"].append({
+        "name": name,
+        "slug": slug,
+        "videos": sorted(videos, key=lambda v: v["modified"], reverse=True)
+    })
 
 @app.on_event("startup")
 async def startup_event():
-    # Start first scan on boot
     threading.Thread(target=background_scanner, daemon=True).start()
-
-@app.post("/api/scan")
-def trigger_scan():
-    if not LIBRARY_STATE["is_scanning"]:
-        threading.Thread(target=background_scanner, daemon=True).start()
-        return {"status": "scanning"}
-    return {"status": "already_scanning"}
 
 @app.get("/api/hub")
 def get_hub():
@@ -158,31 +138,24 @@ def get_thumb(video_id: str):
     
     if video_path and os.path.exists(video_path):
         try:
-            cmd = [
-                "ffmpeg", "-y", "-ss", "00:00:01", "-i", video_path,
-                "-frames:v", "1", "-q:v", "2", str(thumb_path)
-            ]
+            cmd = ["ffmpeg", "-y", "-ss", "00:00:01", "-i", video_path, "-frames:v", "1", "-q:v", "2", str(thumb_path)]
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             if thumb_path.exists():
                 return FileResponse(thumb_path)
-        except Exception as e:
-            print(f"Error generating thumb for {video_id}: {e}")
+        except: pass
             
     return FileResponse(CORE_DIR / "frontend" / "assets" / "logo.png") 
 
 @app.get("/api/stream/{video_id}")
-async def stream_video(video_id: str, request: Request):
+async def stream_video(video_id: str):
     video_path = None
     for sec in LIBRARY_STATE["sections"]:
         for v in sec["videos"]:
             if v["id"] == video_id:
                 video_path = v["path"]
                 break
-    
     if not video_path: raise HTTPException(404)
     return FileResponse(video_path)
-
-import platform
 
 @app.post("/api/open/{video_id}")
 def open_explorer(video_id: str):
@@ -201,12 +174,9 @@ def open_explorer(video_id: str):
             elif system == "Darwin": # macOS
                 subprocess.run(["open", "-R", video_path])
             else: # Linux
-                # Opens the folder containing the file
                 subprocess.run(["xdg-open", os.path.dirname(video_path)])
             return {"status": "opened"}
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-            
+        except: return {"status": "error"}
     return {"status": "not_found"}
 
 @app.post("/api/stop")
@@ -215,7 +185,6 @@ def stop_server():
     def shutdown():
         time.sleep(0.5)
         os._exit(0)
-    
     threading.Thread(target=shutdown).start()
     return {"status": "stopping"}
 
@@ -227,7 +196,6 @@ if FRONTEND_DIR.exists():
 if __name__ == "__main__":
     import uvicorn
     
-    # Tips System for the Console
     TIPS = [
         "TIP: Use the search bar to quickly find any movie in your library.",
         "TIP: Right-click the player for audio and subtitle options.",
@@ -241,7 +209,6 @@ if __name__ == "__main__":
     def console_tips():
         i = 0
         while True:
-            # Clear console effect (simplified)
             print(f"\n[SPMH ACTIVE] {TIPS[i % len(TIPS)]}")
             i += 1
             time.sleep(15)
