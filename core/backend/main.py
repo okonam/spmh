@@ -159,7 +159,7 @@ def get_thumb(video_id: str):
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             if thumb_path.exists(): return FileResponse(thumb_path)
         except: pass
-    return FileResponse(CORE_DIR / "frontend" / "assets" / "logo.png") 
+    return HTTPException(status_code=404, detail="Thumbnail not found") 
 
 @app.get("/api/stream/{video_id}")
 async def stream_video(video_id: str):

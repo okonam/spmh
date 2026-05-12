@@ -1,41 +1,30 @@
-# 📽️ SPMH — Self Portable Media Hub
+# 📽️ Sovrano Media Hub (SPMH) — System Core
+### *Developed by Okonam*
 
-**SPMH** é um motor de hub de mídia leve e portátil projetado para transformar instantaneamente qualquer pasta de arquivos de vídeo em uma biblioteca estilo Netflix. 
-
-Este projeto foi criado para ser **Zero-Config**: você o coloca dentro da sua pasta de vídeos, executa o motor, e ele monta dinamicamente um portal com capas, categorias e streaming direto no seu navegador.
-
----
-
-## 🚀 Como usar
-
-1.  **Clone ou Baixe** este repositório.
-2.  **Mova** a pasta do projeto para dentro da sua pasta raiz de vídeos (ou coloque seus vídeos em uma pasta chamada `media` dentro do projeto).
-3.  **Execute** o arquivo `LIGAR_SPMH.bat`.
-4.  Acesse `http://localhost:8888` no seu navegador.
-
-## ✨ Funcionalidades
-
-- **Escaneamento Recursivo:** Encontra vídeos em todas as subpastas.
-- **Categorização Automática:** Usa os nomes das suas pastas como categorias do hub.
-- **Geração de Thumbnails:** Cria capas para seus vídeos automaticamente usando FFMPEG.
-- **Player Integrado:** Streaming nativo via navegador com suporte a Seek (avançar/retroceder).
-- **Design Premium:** Interface inspirada no Netflix, responsiva e moderna.
-
-## 🛠️ Tecnologias
-
-- **Backend:** Python + FastAPI (Streaming e Escaneamento)
-- **Frontend:** HTML5 + Tailwind CSS + Alpine.js (Interface reativa sem build)
-- **Processamento:** FFMPEG/FFPROBE (Thumbnails e Metadados)
-
-## 🤝 Contribuindo (Open Source)
-
-Este é um projeto de código aberto! Sinta-se à vontade para abrir Issues ou enviar Pull Requests.
-
-**Ideias para o futuro:**
-- [ ] Suporte a Legendas (.srt).
-- [ ] Integração com APIs de Metadados (IMDb/TMDB).
-- [ ] Modo "Cinema" (Fundo escurecido).
-- [ ] Suporte a múltiplos usuários.
+**SPMH** is an ultra-lightweight, portable media engine. It instantly transforms any local video directory into a Netflix-style cinematic library with zero database overhead or complex configuration.
 
 ---
-Desenvolvido com ❤️ para a comunidade.
+
+## 🚀 Deployment & Entry
+This core is designed to be managed by the professional C# launcher located in the root directory:
+
+1.  **Preparation**: Run `SETUP.bat` in the root once to build the virtual environment and fetch core dependencies.
+2.  **Execution**: Use `SPMH.exe` in the root for a hardened, silent startup.
+3.  **Access**: The cinematic portal will launch automatically in your system's default browser.
+
+## ✨ Core Feature Set
+- **Intelligent Parent Scanning:** Automatically maps parent and sibling directories for a clean workspace.
+- **Base64 Security:** Hardened branding and interface assets embedded directly in memory.
+- **Silent Engine:** FastAPI-based backend that runs as a high-performance background process.
+- **Cinematic HUD:** Responsive player with speed control, volume management, and dynamic discovery layers.
+- **Resource Hardening:** Custom stream cleanup logic to ensure maximum browser stability.
+
+## 🛠️ System Architecture
+- **Language:** Python 3.10+ (Primary Motor)
+- **Framework:** FastAPI (Asynchronous Chunked Streaming)
+- **Interface:** Alpine.js + Tailwind CSS (Lightweight Reactivity)
+- **Security:** Base64 Asset Inlining
+- **Management:** C# .NET 4.0 (Silent Process Guard)
+
+---
+Built for the global open-source community that values performance, privacy, and premium aesthetics. 🚀
