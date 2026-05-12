@@ -3,7 +3,7 @@
 
 **SPMH** is a revolutionary, patterns-breaking media hub designed for those who demand a premium cinematic experience without the bloat. It is the only open-source project of its kind that is **extremely lightweight (< 2MB)**, requires **zero pre-configuration**, and delivers a dynamic, user-friendly interface that rivals multi-gigabyte commercial alternatives.
 
-![Project Status](https://img.shields.io/badge/Version-1.5.6--stable-red?style=for-the-badge)
+![Project Status](https://img.shields.io/badge/Version-1.5.7--stable-red?style=for-the-badge)
 ![Build Date](https://img.shields.io/badge/Build-2026.05.12-gold?style=for-the-badge)
 ![Lightweight](https://img.shields.io/badge/Size-%3C%202MB-green?style=for-the-badge)
 ![Open Source](https://img.shields.io/badge/Type-Open%20Source-blue?style=for-the-badge)

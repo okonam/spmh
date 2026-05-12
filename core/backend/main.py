@@ -1,5 +1,5 @@
 """
-SPMH — Self Portable Media Hub (Backend v1.0.6)
+SPMH — Self Portable Media Hub (Backend v1.5.7-stable)
 By Okonam - Cinematic Cross-Platform Media Hub
 """
 
@@ -80,42 +80,81 @@ def background_scanner():
     LIBRARY_STATE["total_videos"] = 0
     LIBRARY_STATE["sections"] = []
     
-    print(f"\n[SCAN] Deep scanning library at: {VIDEO_ROOT}")
-    print(f"[SCAN] Ignoring system folder: {project_folder.name}")
+    # Resolve paths once to avoid comparison issues
+    abs_project = project_folder.resolve()
+    abs_root = VIDEO_ROOT.resolve()
+    
+    print(f"\n[SCAN] Deep scanning library at: {abs_root}")
+    print(f"[SCAN] Project path: {abs_project}")
     
     try:
         # 1. Root Scan (Files in the same level as the Hub folder)
         root_videos = []
-        for item in VIDEO_ROOT.iterdir():
-            if item.is_file() and item.suffix.lower() in VIDEO_EXTENSIONS:
-                vid_id = get_id(str(item))
-                root_videos.append(format_video_data(item, vid_id))
-                LIBRARY_STATE["total_videos"] += 1
-                print(f" -> Found: {item.name}")
+        try:
+            for item in abs_root.iterdir():
+                if item.is_file() and item.suffix.lower() in VIDEO_EXTENSIONS:
+                    vid_id = get_id(str(item))
+                    root_videos.append(format_video_data(item, vid_id))
+                    LIBRARY_STATE["total_videos"] += 1
+                    print(f" -> Found in root: {item.name}")
+        except Exception as e:
+            print(f"[WARN] Error scanning root files: {e}")
         
         if root_videos:
             update_section("Root Files", "root-files", root_videos)
         
         # 2. Folder Scan (Subfolders in the parent directory)
-        for entry in sorted(VIDEO_ROOT.iterdir()):
-            # Only scan directories that are not our own project folder or hidden
-            if entry.is_dir() and entry.name not in SKIP_DIRS and not entry.name.startswith("."):
+        # We collect entries first to avoid issues with changing directory state
+        entries = []
+        try:
+            entries = sorted(list(abs_root.iterdir()))
+        except Exception as e:
+            print(f"[ERROR] Could not list root directory: {e}")
+            return
+
+        for entry in entries:
+            try:
+                # Skip if not a directory
+                if not entry.is_dir():
+                    continue
+                
+                # Skip project folder itself by path, not just name
+                if entry.resolve() == abs_project:
+                    print(f"[SCAN] Skipping project folder: {entry.name}")
+                    continue
+                
+                # Skip hidden folders or known system folders
+                if entry.name.startswith(".") or entry.name in SKIP_DIRS:
+                    continue
+                    
                 videos = []
                 print(f"[SCAN] Checking folder: {entry.name}")
+                
                 for root, dirs, files in os.walk(entry):
+                    # Prune dirs in-place to avoid system/hidden folders
                     dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith(".")]
+                    
+                    # Check if this subfolder is the project folder (safety check)
+                    if Path(root).resolve() == abs_project:
+                        dirs[:] = [] # Stop recursion here
+                        continue
+
                     for file in files:
                         file_path = Path(root) / file
                         if file_path.suffix.lower() in VIDEO_EXTENSIONS:
                             vid_id = get_id(str(file_path))
                             videos.append(format_video_data(file_path, vid_id))
                             LIBRARY_STATE["total_videos"] += 1
-                            print(f"   + {file}")
+                            # print(f"   + {file}") # Excessive logging
                 
                 if videos:
+                    print(f" -> Found {len(videos)} videos in {entry.name}")
                     update_section(entry.name.replace("_", " ").title(), get_id(str(entry)), videos)
+            except Exception as e:
+                print(f"[WARN] Failed to scan folder {entry.name}: {e}")
+                
     except Exception as e:
-        print(f"[ERROR] Scan failed: {e}")
+        print(f"[ERROR] Global scan failed: {e}")
     finally:
         LIBRARY_STATE["is_scanning"] = False
         LIBRARY_STATE["last_update"] = datetime.now().isoformat()
