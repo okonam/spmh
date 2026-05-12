@@ -3,7 +3,7 @@
 
 **SPMH** is a cinematic, zero-config, "Netflix-style" media portal designed for total portability. It transforms any folder containing video files into a premium streaming experience with live previews, custom player controls, and an elegant UI.
 
-![Project Status](https://img.shields.io/badge/Version-1.0.2-red?style=for-the-badge)
+![Project Status](https://img.shields.io/badge/Version-1.1.0-red?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-green?style=for-the-badge)
 
@@ -15,31 +15,23 @@
 - **Cinematic Hero Preview**: Background video loops with random seeking for a live dashboard feel.
 - **Intelligent Favorites**: One-click to save your movies; automatically prunes favorites if files are deleted from the disk.
 - **Deep Scanning Engine**: Asynchronous scanner that maps your local drive and organizes content into sections.
-- **Custom Video Player**: Advanced controls including speed selector (0.5x to 2x), quick skip (±15s), and language/subtitle hints.
+- **Console Tips System**: Rotational tips in the terminal to help you get the most out of the Hub.
 - **Zero-Config Portability**: Designed to run directly from a portable drive or local folder with no complex setup.
 
 ---
 
 ## 🚀 How to Run
 
-### 🪟 Windows (Recommended)
-1.  Run **`Install_Dependencies.exe`** once to prepare the environment.
-2.  Launch **`SPMH.exe`** to start the hub.
+### 🪟 Windows
+1.  Run **`SETUP_SPMH.bat`** once to install dependencies.
+2.  Launch **`RUN_SPMH.bat`** to start the hub.
+3.  Keep the terminal window open to see helpful **Tips**.
 
 ### 🐧 Linux / 🍎 macOS
 1.  Open your terminal in the project folder.
-2.  Make the scripts executable:
-    ```bash
-    chmod +x install.sh run.sh
-    ```
-3.  Run the installer:
-    ```bash
-    ./install.sh
-    ```
-4.  Start the hub:
-    ```bash
-    ./run.sh
-    ```
+2.  Make the scripts executable: `chmod +x install.sh run.sh`
+3.  Run the installer: `./install.sh`
+4.  Start the hub: `./run.sh`
 
 ---
 
@@ -48,7 +40,7 @@
 - **Backend**: Python (FastAPI), Uvicorn.
 - **Frontend**: Alpine.js, Tailwind CSS.
 - **Processing**: FFmpeg (for instant thumbnail generation).
-- **Core Architecture**: Cross-platform Python motor with native launchers for Windows and shell scripts for Unix systems.
+- **Core Architecture**: Universal Python motor with simple shell/batch launchers for maximum compatibility.
 
 ---
 
@@ -60,8 +52,8 @@ spmh/
 │   ├── backend/      # FastAPI Motor & Logic
 │   ├── frontend/     # Netflix-style UI
 │   └── data/         # Metadata & thumbnails
-├── SPMH.exe          # Windows Launcher
-├── Install_Dependencies.exe
+├── RUN_SPMH.bat      # Windows Launcher
+├── SETUP_SPMH.bat    # Windows Installer
 ├── install.sh        # Linux/Mac Installer
 ├── run.sh            # Linux/Mac Launcher
 └── README.md
