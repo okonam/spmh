@@ -137,12 +137,12 @@ def load_cache():
                 LIBRARY_STATE["total_videos"] = data.get("total", 0)
                 LIBRARY_STATE["last_update"] = data.get("updated")
                 
-                # Rebuild path cache recursively
+                # Rebuild path cache recursively (Storing RELATIVE paths)
                 def load_recursive(sections):
                     for s in sections:
-                        # Use all_videos if available (more comprehensive)
                         v_list = s.get("all_videos", []) or s.get("videos", [])
                         for v in v_list:
+                            # v["path"] is now a relative path string
                             VIDEO_PATH_CACHE[v["id"]] = v["path"]
                         if "sub_sessions" in s:
                             load_recursive(s["sub_sessions"])
@@ -172,7 +172,14 @@ def format_video_data(path: Path, vid_id: str, temp_cache: dict):
 
         stats = path.stat()
         size_gb = stats.st_size / (1024**3)
-        temp_cache[vid_id] = str(path.resolve())
+        
+        # Calculate RELATIVE path for portability
+        try:
+            rel_path = str(path.relative_to(VIDEO_ROOT)).replace("\\", "/")
+        except:
+            rel_path = str(path.resolve()).replace("\\", "/")
+
+        temp_cache[vid_id] = rel_path
         
         # Determine category (folder name)
         try:
@@ -184,7 +191,7 @@ def format_video_data(path: Path, vid_id: str, temp_cache: dict):
         res = {
             "id": vid_id,
             "title": path.stem.replace(".", " ").replace("_", " ").title(),
-            "path": str(path.resolve()),
+            "path": rel_path,
             "size": f"{size_gb:.2f} GB",
             "modified": stats.st_mtime,
             "format": path.suffix.upper()[1:],
@@ -399,12 +406,15 @@ def get_thumb(video_id: str):
     thumb_path = THUMB_DIR / f"{video_id}.jpg"
     if thumb_path.exists(): return FileResponse(thumb_path)
     
-    video_path = VIDEO_PATH_CACHE.get(video_id)
-    if not video_path:
+    rel_path = VIDEO_PATH_CACHE.get(video_id)
+    if not rel_path:
         for sec in LIBRARY_STATE["sections"]:
-            for v in sec["videos"]:
+            for v in sec.get("all_videos", []) or sec.get("videos", []):
                 if v["id"] == video_id:
-                    video_path = v["path"]; break
+                    rel_path = v["path"]; break
+    
+    # Reconstruct absolute path
+    video_path = str(VIDEO_ROOT / rel_path) if rel_path else None
     
     # Try to generate thumbnail with concurrency lock
     if video_path and os.path.exists(video_path):
@@ -426,10 +436,10 @@ def get_thumb(video_id: str):
 
 @app.get("/api/stream/{video_id}")
 async def stream_video(video_id: str, request: Request):
-    video_path = VIDEO_PATH_CACHE.get(video_id)
+    rel_path = VIDEO_PATH_CACHE.get(video_id)
     range_header = request.headers.get("Range")
     
-    if not video_path:
+    if not rel_path:
         print(f"[CACHE MISS] ID: {video_id} - Recursive Search...")
         def find_recursive(sections):
             for s in sections:
@@ -441,9 +451,12 @@ async def stream_video(video_id: str, request: Request):
                     if res: return res
             return None
         
-        video_path = find_recursive(LIBRARY_STATE["sections"])
-        if video_path:
-            VIDEO_PATH_CACHE[video_id] = video_path
+        rel_path = find_recursive(LIBRARY_STATE["sections"])
+        if rel_path:
+            VIDEO_PATH_CACHE[video_id] = rel_path
+    
+    # Reconstruct absolute path
+    video_path = str(VIDEO_ROOT / rel_path) if rel_path else None
     
     if not video_path or not os.path.exists(video_path):
         print(f"[STREAM ERROR] Video ID {video_id} not found.")
@@ -457,9 +470,9 @@ async def stream_video(video_id: str, request: Request):
 
 @app.post("/api/open/{video_id}")
 def open_explorer(video_id: str):
-    video_path = VIDEO_PATH_CACHE.get(video_id)
+    rel_path = VIDEO_PATH_CACHE.get(video_id)
     
-    if not video_path:
+    if not rel_path:
         # Recursive search fallback
         def find_path(sections):
             for s in sections:
@@ -470,7 +483,10 @@ def open_explorer(video_id: str):
                     res = find_path(s["sub_sessions"])
                     if res: return res
             return None
-        video_path = find_path(LIBRARY_STATE["sections"])
+        rel_path = find_path(LIBRARY_STATE["sections"])
+    
+    # Reconstruct absolute path
+    video_path = str(VIDEO_ROOT / rel_path) if rel_path else None
     
     if video_path and os.path.exists(video_path):
         system = platform.system()
