@@ -1,4 +1,4 @@
-# 📽️ Sovrano Media Hub (SPMH) — System Core
+# 📽️ Self Portable Media Hub (SPMH) — System Core
 ### *Developed by Okonam*
 
 **SPMH** is an ultra-lightweight, portable media engine. It instantly transforms any local video directory into a Netflix-style cinematic library with zero database overhead or complex configuration.

@@ -1,4 +1,4 @@
-# Sovrano Media Hub (SPMH) 🎬 
+# Self Portable Media Hub (SPMH) 🎬 
 ### *The World's Only Ultra-Lightweight, Zero-Config Open Source Cinema Portal*
 
 **SPMH** is a revolutionary, patterns-breaking media hub designed for those who demand a premium cinematic experience without the bloat. It is the only open-source project of its kind that is **extremely lightweight (< 2MB)**, requires **zero pre-configuration**, and delivers a dynamic, user-friendly interface that rivals multi-gigabyte commercial alternatives.
