@@ -3,10 +3,10 @@
 
 **SPMH** is a revolutionary, patterns-breaking media hub designed for those who demand a premium cinematic experience without the bloat. It is the only open-source project of its kind that is **extremely lightweight (< 2MB)**, requires **zero pre-configuration**, and delivers a dynamic, user-friendly interface that rivals multi-gigabyte commercial alternatives.
 
-![Project Status](https://img.shields.io/badge/Version-1.5.7--stable-red?style=for-the-badge)
-![Build Date](https://img.shields.io/badge/Build-2026.05.12-gold?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.6.1--stable-red?style=for-the-badge)
+![Build Date](https://img.shields.io/badge/Build-2026.05.13-gold?style=for-the-badge)
 ![Lightweight](https://img.shields.io/badge/Size-%3C%202MB-green?style=for-the-badge)
-![Open Source](https://img.shields.io/badge/Type-Open%20Source-blue?style=for-the-badge)
+![OS](https://img.shields.io/badge/OS-Windows%20|%20Linux%20|%20macOS-blue?style=for-the-badge)
 
 > [!CAUTION]
 > ### ⚠️ BETA VERSION - UNDER DEVELOPMENT
@@ -36,13 +36,25 @@ If you are not familiar with GitHub, simply click the button below to download t
 
 ---
 
+---
+
 ## 🚀 How to Use
 
 SPMH is built for total portability. No complex installers or database setups are required.
 
+### 🪟 Windows
 1.  **Deployment**: Simply extract the SPMH folder to **any location** where you want it to read your videos.
 2.  **Launch**: Run `SPMH.exe`. The portal will automatically open in your default browser.
-3.  **Proper Shutdown**: For the best experience, always close the system using the **Shutdown** button within the portal. This ensures the "Personal Server" engine is safely terminated and all resources are released.
+3.  **Proper Shutdown**: For the best experience, always close the system using the **Shutdown** button within the portal.
+
+### 🐧 Linux / 🍎 macOS (Experimental)
+> [!NOTE]
+> Unix support is implemented but currently **untested**. Feedback is welcome.
+
+1.  **Open Terminal** in the SPMH directory.
+2.  **Run Setup**: `./setup.sh` (This sets permissions and installs Python dependencies).
+3.  **Launch**: `./run.sh`.
+4.  **Access**: Open your browser at `http://localhost:8888`.
 
 ---
 
@@ -74,8 +86,10 @@ spmh/
 │   ├── frontend/     # Hardened UI (index.html)
 │   ├── Launcher.cs   # Silent Launcher Source (C#)
 │   └── Setup.cs      # Installer Engine Source (C#)
-├── SPMH.exe          # Professional Entry Point (< 2MB)
-├── SETUP.bat         # One-click environment builder
+├── SPMH.exe          # Windows Entry Point (< 2MB)
+├── setup.sh          # Linux/macOS Setup Script
+├── run.sh            # Linux/macOS Launcher
+├── SETUP.bat         # Windows Environment Builder
 └── README.md         # Documentation
 ```
 
