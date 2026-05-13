@@ -15,6 +15,14 @@
 
 ---
 
+## 📥 Quick Download
+
+If you are not familiar with GitHub, simply click the button below to download the entire project as a ZIP file. Then, just extract it and run `SPMH.exe`.
+
+[![Download SPMH](https://img.shields.io/badge/Download-SPMH_Latest_ZIP-red?style=for-the-badge&logo=github)](https://github.com/okonam/spmh/archive/refs/heads/master.zip)
+
+---
+
 ## 💎 What is SPMH?
 
 **SPMH** is a zero-config, portable media engine that transforms any folder into a cinematic streaming portal. It is designed to provide an elite viewing experience with minimal footprint.
