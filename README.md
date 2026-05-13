@@ -15,23 +15,26 @@
 
 ---
 
-## 💎 Why SPMH is Unique
+## 💎 What is SPMH?
 
-While tools like Plex or Jellyfin are powerful, they are heavy, require complex database management, and force you into account-based ecosystems. **SPMH is the antithesis of bloat.**
+**SPMH** is a zero-config, portable media engine that transforms any folder into a cinematic streaming portal. It is designed to provide an elite viewing experience with minimal footprint.
 
-1.  **Extreme Lightness**: The entire system, including the silent backend engine and the cinematic frontend, is optimized to run under **2MB**. It is the most portable media hub ever built.
-2.  **Zero Configuration**: No databases. No accounts. No setup screens. Drop SPMH in your media collection, and it instantly maps your library.
-3.  **Dynamic Discovery**: Unlike static servers, SPMH uses a recursive parent-mapping logic that looks "behind" the application folder to find your movies without needing permission to your entire drive.
-4.  **Hardened Memory Assets**: To ensure maximum speed and prevent UI tampering, all branding assets (logos, icons) are baked into the core as **Base64 memory strings**. It loads instantly, every time.
+### Core Features:
+*   **High-Efficiency Player**: A robust video engine with support for multiple audio tracks, subtitles, and playback speed control.
+*   **Smart Discovery**: Automatically scans your directories and provides random suggestions to help you decide what to watch.
+*   **Auto-Thumbnails**: Generates high-quality previews for your entire library on-the-fly.
+*   **Brain Rot Mode 🥵**: A TikTok-inspired infinite scroll experience for your local videos—perfect for non-stop entertainment.
+*   **Diagnostics HUD**: Built-in telemetry for power users. Just press **'D'** while a video is playing to see real-time buffer, resolution, and network state.
 
 ---
 
-## 🚀 One-Click Cinematic Setup
+## 🚀 How to Use
 
-1.  **Preparation**: Run `SETUP.bat` once. It automatically builds your Python environment and configures the streaming engine.
-2.  **Launch**: Open `SPMH.exe`. 
-3.  **Experience**: A professional, Netflix-inspired portal will open. Explore with **horizontal drag-to-scroll**, **hover video previews**, and **dynamic section modals**.
-4.  **Stealth Shutdown**: To close the system, use the integrated **Shutdown** button in the portal to safely clean up all background processes.
+SPMH is built for total portability. No complex installers or database setups are required.
+
+1.  **Deployment**: Simply extract the SPMH folder to **any location** where you want it to read your videos.
+2.  **Launch**: Run `SPMH.exe`. The portal will automatically open in your default browser.
+3.  **Proper Shutdown**: For the best experience, always close the system using the **Shutdown** button within the portal. This ensures the "Personal Server" engine is safely terminated and all resources are released.
 
 ---
 
