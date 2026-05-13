@@ -9,9 +9,9 @@
 ![Open Source](https://img.shields.io/badge/Type-Open%20Source-blue?style=for-the-badge)
 
 > [!CAUTION]
-> ### ⚠️ VERSÃO EM DESENVOLVIMENTO (BETA)
-> Este projeto está em fase de testes e desenvolvimento contínuo. Bugs podem ocorrer.
-> **Melhor Experiência:** Para o funcionamento ideal das animações e streaming, utilize navegadores baseados em **Chromium** (Google Chrome, Microsoft Edge, Brave, etc).
+> ### ⚠️ BETA VERSION - UNDER DEVELOPMENT
+> This project is in continuous testing and development phase. Bugs may occur.
+> **Best Experience:** For optimal animation and streaming performance, use **Chromium-based** browsers (Google Chrome, Microsoft Edge, Brave, etc).
 
 ---
 
