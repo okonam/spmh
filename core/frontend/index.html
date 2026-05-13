@@ -298,7 +298,13 @@
                         <div class="aspect-video rounded-3xl overflow-hidden bg-[#141414] shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:z-30 cursor-pointer relative"
                              @mouseenter="handleMouseEnter('mf-'+vid.id)"
                              @click="openDetails(vid)">
-                            <img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover" :class="hoveredVideoId === 'mf-'+vid.id ? 'opacity-0' : 'opacity-100'" loading="lazy">
+                            <img :src="'/api/thumb/' + vid.id" 
+                                 class="w-full h-full object-cover transition-all duration-1000" 
+                                 :class="[
+                                    hoveredVideoId === 'mf-'+vid.id ? 'opacity-0 scale-110' : 'opacity-100',
+                                    !appLoaded ? 'grayscale' : 'grayscale-0'
+                                 ]" 
+                                 loading="lazy">
                             
                             <!-- Loading Spinner for Preview -->
                             <div class="absolute inset-0 flex items-center justify-center bg-black/40 z-20" x-show="hoveredVideoId === 'mf-'+vid.id && !previewLoaded">
@@ -352,7 +358,13 @@
                             <div class="aspect-video rounded-[32px] overflow-hidden bg-[#141414] shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:z-30 cursor-pointer relative" 
                                  @mouseenter="handleMouseEnter(vid.id)" 
                                  @click="openDetails(vid)">
-                                <img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover transition-opacity duration-500" :class="hoveredVideoId === vid.id ? 'opacity-0' : 'opacity-100'" loading="lazy">
+                                <img :src="'/api/thumb/' + vid.id" 
+                                     class="w-full h-full object-cover transition-all duration-1000" 
+                                     :class="[
+                                        hoveredVideoId === vid.id ? 'opacity-0 scale-110' : 'opacity-100',
+                                        !appLoaded ? 'grayscale' : 'grayscale-0'
+                                     ]" 
+                                     loading="lazy">
                                 
                                 <!-- Loading Spinner -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-black/40 z-20" x-show="hoveredVideoId === vid.id && !previewLoaded">
@@ -602,12 +614,30 @@
                     :src="'/api/stream/' + currentVideo.id" 
                     @timeupdate="updateProgress()"
                     @progress="updateHUD()"
+                    @waiting="isBuffering = true"
+                    @playing="isBuffering = false"
+                    @canplay="isBuffering = false"
                     @ended="closePlayer()"
                     @click="togglePlay()"
                     playsinline></video>
 
+                <!-- Loading Overlay (Elite v24) -->
+                <div x-show="isBuffering" x-transition.opacity.duration.300ms 
+                     class="absolute inset-0 z-[80] flex flex-col items-center justify-center bg-black/40 backdrop-blur-md pointer-events-none" x-cloak>
+                    <div class="relative">
+                        <div class="w-24 h-24 border-t-4 border-red-600 border-solid rounded-full animate-spin"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-16 h-16 border-b-4 border-white/20 border-solid rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
+                        </div>
+                    </div>
+                    <p class="mt-8 text-white font-black uppercase tracking-[0.3em] text-2xl animate-pulse text-center leading-relaxed">
+                        Initializing<br> 
+                        <span class="text-[18px] opacity-60 font-medium tracking-normal">Wait the engine finds the video or try again to force a new initialize</span>
+                    </p>
+                </div>
+
                 <!-- UI Overlays -->
-                <div class="absolute inset-0 z-30 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                <div class="absolute inset-0 z-[150] flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                      :class="(showControls || videoPaused || hoveringTimeline) ? 'opacity-100' : ''">
                     
                     <!-- Timeline Preview -->
@@ -840,6 +870,7 @@
                 debugMode: false, appLoaded: false,
                 copyStatus: 'Copy Logs', latency: 0,
                 showControls: true, hoveringTimeline: false, hoverTime: 0, lastUpdate: 0,
+                isBuffering: false,
                 diagData: { network: '', ready: '', buffer: 0, res: '0x0', src: '' },
                 
                 // TikTok Mode State
@@ -1055,22 +1086,24 @@
                     this.currentVideo = video; 
                     this.playing = true; 
                     this.videoPaused = false; 
+                    this.isBuffering = true;
                     this.playbackRate = 1; 
                     this.showRightClickHint = false;
                     
-                    // Fetch real-time metadata for the HUD
-                    try {
-                        const res = await fetch(`/api/video/${video.id}`);
-                        if (res.ok) {
-                            const freshData = await res.json();
-                            this.currentVideo = { ...this.currentVideo, ...freshData };
-                        }
-                    } catch (e) { console.error("HUD Metadata Fetch Error:", e); }
+                    // Non-blocking metadata fetch for the HUD
+                    fetch(`/api/video/${video.id}`)
+                        .then(res => res.ok ? res.json() : null)
+                        .then(freshData => {
+                            if (freshData) this.currentVideo = { ...this.currentVideo, ...freshData };
+                        })
+                        .catch(e => console.error("HUD Metadata Fetch Error:", e));
 
                     this.$nextTick(() => {
                         const p = this.$refs.player;
                         const bg = this.$refs.bgVideo;
                         if (p) {
+                            // Only show buffering if not already ready
+                            if (p.readyState < 3) this.isBuffering = true;
                             p.play().catch(() => { this.videoPaused = true; });
                         }
                         if (bg) bg.play().catch(() => {});
