@@ -34,12 +34,13 @@ PENDING_THUMBS = set()
 current_file = Path(__file__).resolve()
 # spmh/core/backend/main.py -> parent x 3 -> spmh
 project_folder = current_file.parent.parent.parent 
-# VIDEO_ROOT is the folder CONTAINING spmh
-VIDEO_ROOT = project_folder.parent
+# VIDEO_ROOT is the folder CONTAINING spmh (the 'projects' folder)
+VIDEO_ROOT = project_folder.parent.resolve()
 
-# Fallback for safety
+# Fallback for safety - Ensure it exists and is absolute
 if not VIDEO_ROOT.exists():
-    VIDEO_ROOT = project_folder
+    VIDEO_ROOT = project_folder.resolve()
+
 
 # --- PATHS ---
 CORE_DIR = project_folder / "core"
@@ -91,7 +92,66 @@ LIBRARY_STATE = {
     "scan_log": []
 }
 
+def log_scan(msg):
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    full_msg = f"[{timestamp}] {msg}"
+    print(full_msg, flush=True)
+    if "LIBRARY_STATE" in globals() and "scan_log" in LIBRARY_STATE:
+        LIBRARY_STATE["scan_log"].append(full_msg)
+        if len(LIBRARY_STATE["scan_log"]) > 100:
+            LIBRARY_STATE["scan_log"].pop(0)
+
+log_scan(f"ENGINE STARTUP: VIDEO_ROOT set to {VIDEO_ROOT}")
+
 VIDEO_PATH_CACHE = {} # Fast lookup for ID -> Path
+
+def resolve_path_enhanced(video_id: str) -> Optional[str]:
+    """Robustly resolve a video ID to an absolute filesystem path with self-healing."""
+    # 1. Check Global Cache first (Fastest)
+    rel_path = VIDEO_PATH_CACHE.get(video_id)
+    
+    # 2. Fallback: Search all sections in LIBRARY_STATE
+    if not rel_path:
+        def find_in_sections(sections):
+            for s in sections:
+                v_list = s.get("all_videos", []) or s.get("videos", [])
+                for v in v_list:
+                    if v["id"] == video_id: return v["path"]
+                if "sub_sessions" in s:
+                    res = find_in_sections(s["sub_sessions"])
+                    if res: return res
+            return None
+        rel_path = find_in_sections(LIBRARY_STATE["sections"])
+
+    if not rel_path:
+        return None
+
+    # 3. Direct Resolution (Normalize drive letters for comparison)
+    clean_rel = rel_path.lstrip("/").lstrip("\\")
+    
+    # Ensure VIDEO_ROOT is absolute and normalized (DRIVE LETTER CASE INSENSITIVITY)
+    v_root_str = str(VIDEO_ROOT.resolve())
+    if len(v_root_str) > 1 and v_root_str[1] == ":": v_root_str = v_root_str[0].upper() + v_root_str[1:]
+    
+    absolute_path = Path(v_root_str) / clean_rel
+    
+    if absolute_path.exists():
+        return str(absolute_path.resolve())
+    
+    # 4. Fallback: Search recursively for the filename (Auto-healing)
+    filename = Path(clean_rel).name
+    log_scan(f"Path direct match failed for {video_id}. Attempting recursive self-healing for: {filename}")
+    
+    # Global search within VIDEO_ROOT (Prototype Strategy)
+    # This is extremely effective if folders were renamed or moved within the projects root
+    v_root_search = str(VIDEO_ROOT.resolve())
+    for root, _, files in os.walk(v_root_search):
+        if filename in files:
+            found_path = Path(root) / filename
+            log_scan(f"Self-healing successful: found {filename} at {found_path}")
+            return str(found_path.resolve())
+                    
+    return None
 
 def save_cache():
     try:
@@ -157,12 +217,24 @@ def load_cache():
 def get_id(path_str):
     """Generate a unique ID based on the relative path from VIDEO_ROOT for portability."""
     try:
-        rel_path = os.path.relpath(path_str, str(VIDEO_ROOT))
-        # Normalize to forward slashes for cross-platform/consistency
-        portable_path = rel_path.replace("\\", "/")
+        # Use absolute resolved paths for both
+        abs_path = Path(path_str).resolve()
+        abs_root = VIDEO_ROOT.resolve()
+        
+        # Normalize drive letters to uppercase for Windows consistency
+        p_str = str(abs_path)
+        r_str = str(abs_root)
+        if len(p_str) > 1 and p_str[1] == ":": p_str = p_str[0].upper() + p_str[1:]
+        if len(r_str) > 1 and r_str[1] == ":": r_str = r_str[0].upper() + r_str[1:]
+        
+        rel_path = os.path.relpath(p_str, r_str)
+        # Normalize to forward slashes and LOWERCASE for total case-insensitive ID consistency
+        portable_path = rel_path.replace("\\", "/").lower()
         return hashlib.md5(portable_path.encode()).hexdigest()
-    except:
-        return hashlib.md5(path_str.replace("\\", "/").encode()).hexdigest()
+    except Exception as e:
+        # Fallback normalization
+        p_norm = path_str.replace("\\", "/").lower()
+        return hashlib.md5(p_norm.encode()).hexdigest()
 
 def format_video_data(path: Path, vid_id: str, temp_cache: dict):
     try:
@@ -192,12 +264,18 @@ def format_video_data(path: Path, vid_id: str, temp_cache: dict):
             "id": vid_id,
             "title": path.stem.replace(".", " ").replace("_", " ").title(),
             "path": rel_path,
+            "full_path": str(path.resolve()),
             "size": f"{size_gb:.2f} GB",
             "modified": stats.st_mtime,
             "format": path.suffix.upper()[1:],
+            "codec": "H.264" if suffix == ".mp4" else "AVC/HEVC",
             "duration": "N/A",
             "category": category
         }
+        
+        # Diagnostic Log
+        if vid_id == "2db75058c64445f404d86657a5e2ef67":
+             print(f"[DIAG] Metadata generated for {vid_id}: {res['full_path']}")
 
         # Queue thumbnail if missing
         thumb_path = THUMB_DIR / f"{vid_id}.jpg"
@@ -401,23 +479,31 @@ def get_hub():
         "scan_log": LIBRARY_STATE["scan_log"]
     }
 
+@app.get("/api/video/{video_id}")
+def get_video_info(video_id: str):
+    """Directly resolve path and metadata for the HUD."""
+    full_path = resolve_path_enhanced(video_id)
+    if not full_path:
+        raise HTTPException(404, detail="Video not found")
+    
+    path_obj = Path(full_path)
+    return {
+        "id": video_id,
+        "full_path": str(full_path),
+        "codec": "H.264" if path_obj.suffix.lower() == ".mp4" else "AVC/HEVC",
+        "format": path_obj.suffix.upper()[1:]
+    }
+
 @app.get("/api/thumb/{video_id}")
 def get_thumb(video_id: str):
     thumb_path = THUMB_DIR / f"{video_id}.jpg"
     if thumb_path.exists(): return FileResponse(thumb_path)
     
-    rel_path = VIDEO_PATH_CACHE.get(video_id)
-    if not rel_path:
-        for sec in LIBRARY_STATE["sections"]:
-            for v in sec.get("all_videos", []) or sec.get("videos", []):
-                if v["id"] == video_id:
-                    rel_path = v["path"]; break
-    
-    # Reconstruct absolute path
-    video_path = str(VIDEO_ROOT / rel_path) if rel_path else None
+    # Reconstruct absolute path via Resolver
+    video_path = resolve_path_enhanced(video_id)
     
     # Try to generate thumbnail with concurrency lock
-    if video_path and os.path.exists(video_path):
+    if video_path:
         with FFMPEG_LOCK:
             try:
                 cmd = ["ffmpeg", "-y", "-ss", "00:00:01", "-i", video_path, "-frames:v", "1", "-q:v", "2", str(thumb_path)]
@@ -434,61 +520,64 @@ def get_thumb(video_id: str):
         
     return HTTPException(status_code=404, detail="Thumbnail not found") 
 
+from fastapi.responses import StreamingResponse
+
 @app.get("/api/stream/{video_id}")
 async def stream_video(video_id: str, request: Request):
-    rel_path = VIDEO_PATH_CACHE.get(video_id)
-    range_header = request.headers.get("Range")
-    
-    if not rel_path:
-        print(f"[CACHE MISS] ID: {video_id} - Recursive Search...")
-        def find_recursive(sections):
-            for s in sections:
-                v_list = s.get("all_videos", []) or s.get("videos", [])
-                for v in v_list:
-                    if v["id"] == video_id: return v["path"]
-                if "sub_sessions" in s:
-                    res = find_recursive(s["sub_sessions"])
-                    if res: return res
-            return None
-        
-        rel_path = find_recursive(LIBRARY_STATE["sections"])
-        if rel_path:
-            VIDEO_PATH_CACHE[video_id] = rel_path
-    
-    # Reconstruct absolute path
-    video_path = str(VIDEO_ROOT / rel_path) if rel_path else None
-    
+    video_path = resolve_path_enhanced(video_id)
     if not video_path or not os.path.exists(video_path):
-        print(f"[STREAM ERROR] Video ID {video_id} not found.")
-        raise HTTPException(404)
+        raise HTTPException(404, detail="Video file not found")
 
-    mime_type, _ = mimetypes.guess_type(video_path)
-    if not mime_type: mime_type = "video/mp4"
+    file_size = os.path.getsize(video_path)
+    mime_type = "video/mp4" if video_path.lower().endswith(".mp4") else (mimetypes.guess_type(video_path)[0] or "video/mp4")
+    
+    range_header = request.headers.get("Range")
 
-    print(f"[STREAM] Serving: {os.path.basename(video_path)} | Mime: {mime_type} | Range: {range_header}")
-    return FileResponse(video_path, media_type=mime_type)
+    def get_file_chunk(path, start, end, chunk_size=1024*1024):
+        with open(path, "rb") as f:
+            f.seek(start)
+            while (pos := f.tell()) <= end:
+                read_size = min(chunk_size, end + 1 - pos)
+                if read_size <= 0: break
+                yield f.read(read_size)
+
+    if range_header:
+        try:
+            parts = range_header.replace("bytes=", "").split("-")
+            start = int(parts[0])
+            end = int(parts[1]) if parts[1] else file_size - 1
+        except:
+            start, end = 0, file_size - 1
+        
+        if start >= file_size: raise HTTPException(416)
+        
+        content_length = end - start + 1
+        return StreamingResponse(
+            get_file_chunk(video_path, start, end),
+            status_code=206,
+            headers={
+                "Content-Range": f"bytes {start}-{end}/{file_size}",
+                "Accept-Ranges": "bytes",
+                "Content-Length": str(content_length),
+                "Content-Type": mime_type,
+            }
+        )
+
+    # Full file delivery
+    return StreamingResponse(
+        get_file_chunk(video_path, 0, file_size - 1),
+        headers={
+            "Content-Length": str(file_size),
+            "Content-Type": mime_type,
+            "Accept-Ranges": "bytes"
+        }
+    )
 
 @app.post("/api/open/{video_id}")
 def open_explorer(video_id: str):
-    rel_path = VIDEO_PATH_CACHE.get(video_id)
+    video_path = resolve_path_enhanced(video_id)
     
-    if not rel_path:
-        # Recursive search fallback
-        def find_path(sections):
-            for s in sections:
-                v_list = s.get("all_videos", []) or s.get("videos", [])
-                for v in v_list:
-                    if v["id"] == video_id: return v["path"]
-                if "sub_sessions" in s:
-                    res = find_path(s["sub_sessions"])
-                    if res: return res
-            return None
-        rel_path = find_path(LIBRARY_STATE["sections"])
-    
-    # Reconstruct absolute path
-    video_path = str(VIDEO_ROOT / rel_path) if rel_path else None
-    
-    if video_path and os.path.exists(video_path):
+    if video_path:
         system = platform.system()
         try:
             if system == "Windows": subprocess.run(["explorer", "/select,", video_path])
@@ -497,6 +586,23 @@ def open_explorer(video_id: str):
             return {"status": "opened"}
         except: return {"status": "error"}
     return {"status": "not_found"}
+
+@app.post("/api/scan/reset")
+def reset_library():
+    """Wipe cache and force full re-scan."""
+    global LIBRARY_STATE, VIDEO_PATH_CACHE
+    try:
+        if CACHE_FILE.exists():
+            CACHE_FILE.unlink()
+        LIBRARY_STATE["sections"] = []
+        VIDEO_PATH_CACHE = {}
+        LIBRARY_STATE["total_videos"] = 0
+        log_scan("User triggered CACHE RESET. Cleaning up...")
+        # Restart scanner
+        threading.Thread(target=background_scanner, daemon=True).start()
+        return {"status": "reset_started"}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
 
 @app.post("/api/stop")
 def stop_server():

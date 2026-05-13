@@ -20,28 +20,156 @@
         .netflix-gradient { background: linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0) 50%, rgba(10,10,10,0.8) 100%); }
         .hero-mask { background: linear-gradient(to right, rgba(10,10,10,0) 0%, rgba(10,10,10,0) 60%, #0a0a0a 75%, rgba(10,10,10,0) 90%, rgba(10,10,10,0) 100%); }
         .hero-v-mask { 
-            -webkit-mask-image: linear-gradient(to right, black 60%, transparent 75%);
-            mask-image: linear-gradient(to right, black 60%, transparent 75%);
+            -webkit-mask-image: linear-gradient(to right, black 60%, transparent 85%);
+            mask-image: linear-gradient(to right, black 60%, transparent 85%);
         }
+
+        /* Glass HUD Styles */
+        .glass-hud {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        .glass-hud:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+
+        /* Kinetic Text Masking */
+        .kinetic-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-size: cover;
+            background-position: center;
+            font-black: 900;
+        }
+
+        .text-glow { text-shadow: 0 2px 40px rgba(0,0,0,0.9); }
+        
+        .progress-line { height: 3px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; width: 40px; }
+        .progress-fill { height: 100%; background: #dc2626; width: 0%; }
+        .active .progress-fill { width: 100%; transition: width 10s linear; }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        .btn-nav:hover { background: #dc2626; border-color: #dc2626; color: white; transform: scale(1.1); }
+
+        .btn-shuffle-v11 {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .btn-shuffle-v11:hover { background: #dc2626; border-color: #dc2626; transform: rotate(180deg); }
         .fade-in { animation: fadeIn 0.8s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes netflix-logo { 
-            0% { transform: scale(0.8); opacity: 0; filter: brightness(0); } 
-            50% { transform: scale(1); opacity: 1; filter: brightness(1.2); } 
-            100% { transform: scale(1.1); opacity: 0; filter: brightness(2); } 
-        }
-        .animate-netflix { animation: netflix-logo 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #dc2626; cursor: pointer; }
+        
+        /* Elite Player v24 Prototype Styles */
+        .hide-cursor { cursor: none !important; }
+        .ambilight { filter: blur(80px) brightness(0.4) saturate(1.5); opacity: 0.4; transition: all 1s ease; }
+        
+        .preview-fixed-center {
+            width: 280px;
+            aspect-ratio: 16/9;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 80px rgba(0,0,0,1);
+            overflow: hidden;
+            background: #000;
+            position: absolute;
+            left: 50%;
+            bottom: 160px;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .preview-time-tag {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            padding: 10px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 900;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .timeline-container {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .timeline-track {
+            height: 8px;
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timeline-fill {
+            height: 100%;
+            background: #dc2626;
+            border-radius: 10px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .player-range { -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 10px; height: 4px; }
+        .player-range::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: #dc2626; cursor: pointer; border: 2px solid white; }
+
+        /* Brain Rot / TikTok Mode Styles */
+        .tiktok-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #000;
+        }
+        .tiktok-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #dc2626;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(220, 38, 36, 0.4);
+            transition: width 1s linear;
+        }
+        .bento-card {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bento-card:hover {
+            transform: scale(1.02) translateY(-5px);
+            z-index: 40;
+        }
     </style>
 </head>
-<body x-data="hubApp()" @keydown.escape="closeAll()" @scroll.window="scrolled = window.scrollY > 50">
+<body x-data="hubApp()" 
+      class="overflow-x-hidden bg-[#0a0a0a] text-white" 
+      :class="(playing && !showControls && !videoPaused) ? 'hide-cursor' : ''"
+      @keydown.escape="closeAll()" 
+      @mousemove="handleGlobalMove($event)"
+      @scroll.window="scrolled = window.scrollY > 50">
 
     <!-- ── Transition Overlay ── -->
-    <div x-show="showIntro || !appLoaded" x-transition.opacity.duration.500ms class="fixed inset-0 z-[9500] bg-black flex flex-col items-center justify-center">
-        <img src="/assets/logo.png" class="h-32 md:h-48 w-auto object-contain" :class="showIntro ? 'animate-netflix' : 'animate-pulse'">
-        <div x-show="!showIntro" class="mt-8 w-48 h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-red-600 animate-[loading_2s_ease-in-out_infinite]"></div></div>
+    <div x-show="!appLoaded" x-transition.opacity.duration.400ms class="fixed inset-0 z-[9500] bg-black flex flex-col items-center justify-center">
+        <img src="/assets/logo.png" class="h-32 md:h-48 w-auto object-contain animate-pulse">
+        <div class="mt-8 w-48 h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-red-600 animate-[loading_2s_ease-in-out_infinite]"></div></div>
     </div>
 
     <!-- ── Header ── -->
@@ -55,57 +183,95 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
+                <button @click="enterTikTokMode()" class="bg-white/5 border border-white/10 hover:bg-red-600 hover:border-red-600 px-6 py-3 rounded-xl transition-all flex items-center gap-3 font-bold uppercase text-xs tracking-tighter group">
+                    <svg class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    Brain Rot Mode
+                </button>
                 <button @click="showOnlyFavorites = !showOnlyFavorites" class="flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-bold uppercase text-xs border" :class="showOnlyFavorites ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10'"><svg class="w-5 h-5" :fill="showOnlyFavorites ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>Favorites</button>
                 <button @click="showShutdown = true" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-xl transition-all flex items-center gap-3 shadow-lg shadow-red-600/20 font-bold uppercase text-xs tracking-tighter"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>Shutdown</button>
             </div>
         </div>
     </header>
 
-    <!-- ── Cinematic Hero ── -->
-    <section x-show="!searchQuery && !showOnlyFavorites && featuredList.length > 0" class="relative h-[95vh] w-full overflow-hidden bg-black" x-transition.opacity>
+    <!-- ── Cinematic Hero Engine v11 ── -->
+    <section x-show="!searchQuery && !showOnlyFavorites && featuredList.length > 0" 
+             class="relative h-[95vh] w-full overflow-hidden bg-black" 
+             x-transition.opacity>
+        
         <template x-for="(vid, index) in featuredList" :key="vid.id">
             <div x-show="heroIndex === index" x-transition.opacity.duration.1000ms class="absolute inset-0">
+                
                 <div class="absolute inset-0 flex">
-                    <!-- Thumbnail (Bottom Layer) -->
+                    <!-- Right Thumb (Deep Layer) -->
                     <div class="absolute top-0 right-0 w-[70%] h-full overflow-hidden bg-black">
                         <img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover opacity-60">
                     </div>
                     
-                    <!-- Video (Top Layer with Transparent Mask) -->
-                    <div class="w-[75%] h-full relative overflow-hidden bg-black hero-v-mask">
+                    <!-- Left Video (Cinematic Layer with Mask) -->
+                    <div class="w-full md:w-[75%] h-full relative overflow-hidden bg-black hero-v-mask">
                         <video autoplay muted loop playsinline 
                             :src="'/api/stream/' + vid.id" 
-                            preload="auto"
-                            class="w-full h-full object-cover opacity-90" 
-                            @loadedmetadata="$el.currentTime = Math.random() * ($el.duration * 0.8)"
-                            @error="$el.style.display='none'"></video>
+                            class="w-full h-full object-cover opacity-100"
+                            @loadedmetadata="$el.currentTime = Math.random() * ($el.duration * 0.8)"></video>
                     </div>
                 </div>
-                <div class="absolute inset-0 netflix-gradient"></div>
-                <div class="absolute bottom-[25%] left-10 md:left-20 max-w-4xl z-10">
-                    <div class="flex items-center gap-4 mb-6"><span class="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded uppercase tracking-widest">Featured Now</span><button @click="shuffleHero()" class="flex items-center gap-2 text-xs font-bold text-white/40 hover:text-white transition-colors group"><svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path></svg>Shuffle Suggestions</button></div>
-                    <h1 class="text-3xl md:text-5xl font-black mt-2 mb-10 drop-shadow-2xl line-clamp-2 leading-none tracking-tighter" x-text="vid.title"></h1>
-                    <div class="flex flex-wrap gap-4"><button @click="playVideo(vid)" class="bg-white text-black px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-gray-200 transition-all text-xl shadow-2xl"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> PLAY NOW</button><button @click="openDetails(vid)" class="bg-white/10 text-white px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-white/20 transition-all backdrop-blur-xl text-xl border border-white/10"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> DETAILS</button></div>
+
+                <!-- ── Cinematic Fusion Gradients ── -->
+                <div class="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent z-10 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent z-10 pointer-events-none"></div>
+
+                <!-- Content Overlay -->
+                <div class="absolute bottom-[20%] md:bottom-[25%] left-6 md:left-20 max-w-4xl z-20">
+                    
+                    <div class="flex items-center gap-4 mb-6 md:mb-8">
+                        <span class="bg-red-600 text-white text-[10px] font-black px-4 py-2 rounded uppercase tracking-widest shadow-lg">Featured Now</span>
+                        <button @click="shuffleHero()" class="btn-shuffle-v11 flex items-center gap-3 px-4 py-2 rounded-lg text-[10px] font-black text-white uppercase tracking-widest group">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path></svg>
+                            Shuffle
+                        </button>
+                    </div>
+
+                    <!-- Kinetic Title (Resized to 60px/text-6xl) -->
+                    <h1 class="kinetic-text text-4xl md:text-6xl font-black mt-2 mb-8 md:mb-10 drop-shadow-2xl line-clamp-2 leading-none tracking-tighter text-white text-glow uppercase" 
+                        :style="`background-image: url('/api/thumb/${vid.id}')`"
+                        x-text="vid.title"></h1>
+
+                    <div class="flex flex-wrap gap-6">
+                        <button @click="playVideo(vid)" class="bg-red-600 text-white px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-red-700 transition-all text-xl shadow-2xl shadow-red-600/20">
+                            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 
+                            WATCH NOW
+                        </button>
+                        <button @click="openDetails(vid)" class="glass-hud text-white px-12 py-5 rounded-2xl font-black flex items-center gap-4 hover:bg-white/10 transition-all text-xl border border-white/10 uppercase group">
+                            <svg class="w-8 h-8 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Information
+                        </button>
+                    </div>
                 </div>
             </div>
         </template>
+
+        <!-- Navigation Arrows -->
         <div class="absolute inset-y-0 left-0 flex items-center px-6 z-50">
-            <button @click="heroIndex = (heroIndex - 1 + featuredList.length) % featuredList.length" class="p-5 rounded-full bg-white/10 hover:bg-red-600 border border-white/20 backdrop-blur-xl transition-all shadow-2xl group">
-                <svg class="w-8 h-8 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+            <button @click="heroIndex = (heroIndex - 1 + featuredList.length) % featuredList.length" class="btn-nav p-5 rounded-full">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
             </button>
         </div>
         <div class="absolute inset-y-0 right-0 flex items-center px-6 z-50">
-            <button @click="heroIndex = (heroIndex + 1) % featuredList.length" class="p-5 rounded-full bg-white/10 hover:bg-red-600 border border-white/20 backdrop-blur-xl transition-all shadow-2xl group">
-                <svg class="w-8 h-8 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+            <button @click="heroIndex = (heroIndex + 1) % featuredList.length" class="btn-nav p-5 rounded-full">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
             </button>
         </div>
 
-        <!-- Hero Pagination Dots -->
-        <div class="absolute bottom-10 right-10 z-[100] flex gap-3">
-            <template x-for="(hero, idx) in featuredList" :key="hero.id">
-                <button @click="heroIndex = idx" 
-                        class="h-1.5 transition-all duration-500 rounded-full cursor-pointer shadow-lg"
-                        :class="heroIndex === idx ? 'w-10 bg-red-600' : 'w-4 bg-white/20 hover:bg-white/40'"></button>
+        <!-- Progress Indicators (Aligned Right & Higher) -->
+        <div class="absolute bottom-32 right-10 z-30 flex items-center gap-6">
+            <template x-for="(vid, index) in featuredList" :key="'nav-'+vid.id">
+                <button @click="heroIndex = index" 
+                        class="group flex flex-col gap-2"
+                        :class="heroIndex === index ? 'active' : ''">
+                    <div class="progress-line">
+                        <div class="progress-fill" :style="`background-color: ${heroIndex === index ? '#dc2626' : 'rgba(255,255,255,0.05)'}`"></div>
+                    </div>
+                </button>
             </template>
         </div>
     </section>
@@ -174,47 +340,46 @@
                     </h2>
                     <div class="h-px flex-1 bg-white/10 group-hover:bg-red-600/20"></div>
                 </div>
-                <div class="flex overflow-x-auto gap-8 pb-10 px-4 no-scrollbar cursor-grab active:cursor-grabbing select-none"
+                
+                <div class="flex items-center gap-6 overflow-x-auto pb-10 px-4 no-scrollbar cursor-grab active:cursor-grabbing select-none"
                      @mousedown="isDown = true; startX = $event.pageX - $el.offsetLeft; scrollLeft = $el.scrollLeft"
-                     @mouseleave="isDown = false; handleMouseLeave($el)"
+                     @mouseleave="isDown = false"
                      @mouseup="isDown = false"
                      @mousemove="if(!isDown) return; $event.preventDefault(); const x = $event.pageX - $el.offsetLeft; const walk = (x - startX) * 2; $el.scrollLeft = scrollLeft - walk"
                      x-data="{ isDown: false, startX: 0, scrollLeft: 0 }">
-                    <template x-for="vid in (section.all_videos || section.videos).slice(0, 20)" :key="vid.id">
+                    <template x-for="vid in (section.all_videos || section.videos).slice(0, 24)" :key="vid.id">
                         <div class="flex-none w-72 md:w-80 group relative" @mouseleave="handleMouseLeave($el)">
-                            <div class="aspect-video rounded-3xl overflow-hidden bg-[#141414] shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:z-30 cursor-pointer relative" 
+                            <div class="aspect-video rounded-[32px] overflow-hidden bg-[#141414] shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:z-30 cursor-pointer relative" 
                                  @mouseenter="handleMouseEnter(vid.id)" 
                                  @click="openDetails(vid)">
-                                <img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover" :class="hoveredVideoId === vid.id ? 'opacity-0' : 'opacity-100'" loading="lazy">
+                                <img :src="'/api/thumb/' + vid.id" class="w-full h-full object-cover transition-opacity duration-500" :class="hoveredVideoId === vid.id ? 'opacity-0' : 'opacity-100'" loading="lazy">
                                 
-                                <!-- Loading Spinner for Preview -->
+                                <!-- Loading Spinner -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-black/40 z-20" x-show="hoveredVideoId === vid.id && !previewLoaded">
                                     <div class="w-8 h-8 border-4 border-red-600/20 border-t-red-600 rounded-full animate-spin"></div>
                                 </div>
 
-                                <template x-if="hoveredVideoId === vid.id">
-                                    <div class="absolute inset-0 z-10">
-                                        <video :data-preview-id="vid.id" class="absolute inset-0 w-full h-full object-cover bg-black" 
-                                            :src="'/api/stream/' + vid.id" 
-                                            autoplay muted loop playsinline
-                                            preload="none"
-                                            @loadeddata="previewLoaded = true"
-                                            @error="previewLoaded = true"
-                                            @loadedmetadata="setPreviewTime($el)"
-                                            @canplay="$el.play()"></video>
-                                    </div>
-                                </template>
+                                <!-- Preview Layer -->
+                                <div class="absolute inset-0 z-10" x-show="hoveredVideoId === vid.id">
+                                    <video :data-preview-id="vid.id" class="absolute inset-0 w-full h-full object-cover bg-black" 
+                                        :src="'/api/stream/' + vid.id" 
+                                        autoplay muted loop playsinline
+                                        preload="none"
+                                        @loadeddata="previewLoaded = true"
+                                        @error="previewLoaded = true"
+                                        @loadedmetadata="setPreviewTime($el)"></video>
+                                </div>
 
-                                <!-- Favorite Button - Top Right -->
-                                <button @click.stop="toggleFavorite(vid.id)" class="absolute top-4 right-4 z-[80] p-2 rounded-full backdrop-blur-md transition-all hover:scale-110 shadow-xl" :class="isFavorite(vid.id) ? 'bg-red-600 text-white' : 'bg-black/60 text-white/60 hover:text-white'"><svg class="w-5 h-5" :fill="isFavorite(vid.id) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></button>
+                                <!-- Favorite Button -->
+                                <button @click.stop="toggleFavorite(vid.id)" class="absolute top-4 right-4 z-[80] p-2.5 rounded-full backdrop-blur-md transition-all hover:scale-110 shadow-xl" :class="isFavorite(vid.id) ? 'bg-red-600 text-white' : 'bg-black/60 text-white/60 hover:text-white'"><svg class="w-5 h-5" :fill="isFavorite(vid.id) ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></button>
                                 
-                                <!-- Actions Overlay -->
+                                <!-- Play Overlay -->
                                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-6 z-[70]">
                                     <button @click.stop="playVideo(vid)" class="bg-red-600 text-white p-4 rounded-full hover:scale-125 hover:rotate-6 transition-all shadow-[0_0_30px_rgba(220,38,38,0.5)]"><svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
                                     <button @click.stop="openDetails(vid)" class="bg-white/10 text-white p-4 rounded-full hover:scale-125 transition-all backdrop-blur-2xl border border-white/20"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
                                 </div>
                             </div>
-                            <h3 class="mt-4 font-bold text-gray-500 group-hover:text-white transition-colors px-4 text-sm line-clamp-1" x-text="vid.title"></h3>
+                            <h3 class="mt-5 font-bold text-white/30 group-hover:text-white transition-colors px-4 text-sm line-clamp-1 tracking-tight" x-text="vid.title"></h3>
                         </div>
                     </template>
                 </div>
@@ -222,61 +387,80 @@
         </template>
     </main>
 
-    <!-- More Info Modal (Responsive & Premium) -->
+
+
+    <!-- ── More Info Modal (Prototype v3.1 Inspired) ── -->
     <div x-show="showModal" 
-         class="fixed inset-0 z-[8000] flex items-center justify-center p-4 md:p-10"
+         class="fixed inset-0 z-[8000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
          x-cloak>
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="showModal = false"></div>
-        <div class="relative bg-[#141414] w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-2xl no-scrollbar">
-            <button @click="showModal = false" class="absolute top-6 right-6 z-50 p-3 bg-black/50 hover:bg-black/80 rounded-full transition-all">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+        
+        <div class="absolute inset-0" @click="showModal = false"></div>
+        
+        <div class="relative w-full max-w-2xl bg-[#0a0a0a]/95 backdrop-blur-[30px] rounded-[40px] overflow-hidden flex flex-col shadow-2xl border border-white/5">
             
-            <div class="relative h-[250px] md:h-[500px] group/detail-video">
-                <img x-show="!detailVideo" :src="'/api/thumb/' + detailVideo?.id" class="w-full h-full object-cover">
+            <!-- Close Button -->
+            <button @click="showModal = false" class="absolute top-6 right-6 z-50 p-2 bg-black/40 hover:bg-red-600 rounded-full transition-all text-white/40 hover:text-white border border-white/10 backdrop-blur-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <!-- Preview Section -->
+            <div class="w-full h-72 relative bg-black">
                 <template x-if="showModal && detailVideo">
-                    <video class="w-full h-full object-cover bg-black" 
+                    <video autoplay muted loop playsinline 
                         :src="'/api/stream/' + detailVideo.id" 
-                        autoplay muted loop 
-                        preload="auto"
-                        @loadedmetadata="setPreviewTime($el)"
-                        @error="detailVideo = null"></video>
+                        class="w-full h-full object-cover opacity-70"
+                        @loadedmetadata="$el.currentTime = Math.random() * ($el.duration * 0.8)"></video>
                 </template>
-                <div class="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent"></div>
-                <div class="absolute bottom-6 left-6 md:bottom-10 md:left-10 md:right-10">
-                    <h2 class="text-3xl md:text-6xl font-black uppercase tracking-tighter mb-4 md:mb-6 line-clamp-2" x-text="detailVideo?.title"></h2>
-                    <div class="flex flex-wrap gap-3 md:gap-4">
-                        <button @click="playVideo(detailVideo); showModal = false" class="bg-white text-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-black flex items-center gap-2 md:gap-3 hover:scale-105 transition-all text-xs md:text-sm shadow-xl">
-                            <svg class="w-4 h-4 md:w-5 md:h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> PLAY NOW
-                        </button>
-                        <button @click="openInExplorer(detailVideo?.id)" class="bg-white/10 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-black flex items-center gap-2 md:gap-3 hover:bg-white/20 transition-all backdrop-blur-xl text-xs md:text-sm border border-white/10">
-                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg> FOLDER
-                        </button>
-                    </div>
-                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent"></div>
             </div>
 
-            <div class="p-6 md:p-10 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-                <div class="md:col-span-2 space-y-4 md:space-y-6">
-                    <div class="flex items-center gap-4 text-xs md:text-sm font-bold uppercase tracking-widest">
-                        <span class="text-green-500">98% Match</span>
-                        <span class="text-white/40">2026</span>
-                        <span class="border border-white/20 px-2 py-0.5 rounded text-[8px] text-white/40">4K Ultra HD</span>
+            <!-- Content Section -->
+            <div class="p-10 space-y-8">
+                
+                <!-- Main Header -->
+                <div class="space-y-2">
+                    <h1 class="text-4xl md:text-[48px] font-black uppercase tracking-tighter leading-tight md:leading-none line-clamp-2" x-text="detailVideo?.title || 'Loading...'"></h1>
+                    <div class="flex items-center gap-2 text-red-600 font-bold uppercase text-[10px] md:text-xs tracking-widest">
+                        <span x-text="detailVideo?.size || '--'"></span>
+                        <span class="opacity-20 text-white">|</span>
+                        <span>System File Analysis</span>
                     </div>
-                    <p class="text-white/70 text-base md:text-lg leading-relaxed" x-text="'Experience high-fidelity streaming of ' + detailVideo?.title + '. Powered by SPMH Engine.'"></p>
                 </div>
-                <div class="space-y-4 md:space-y-6 text-xs md:text-sm bg-white/5 p-6 rounded-2xl border border-white/10">
+
+                <!-- Internal Info Grid -->
+                <div class="grid grid-cols-2 gap-8 py-2 border-t border-white/5 pt-8">
                     <div>
-                        <span class="text-white/40 block mb-1 uppercase text-[10px] tracking-widest">Category</span>
-                        <span class="font-black text-white/90 text-sm md:text-base" x-text="detailVideo?.category || 'Uncategorized'"></span>
+                        <div class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Asset ID</div>
+                        <div class="text-[11px] font-mono opacity-50 truncate text-white/80" x-text="detailVideo?.id"></div>
                     </div>
                     <div>
-                        <span class="text-white/40 block mb-1 uppercase text-[10px] tracking-widest">System Path</span>
-                        <span class="font-mono text-[10px] text-white/60 break-all leading-tight" x-text="detailVideo?.path"></span>
+                        <div class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">File Format</div>
+                        <div class="text-sm font-bold text-white/80" x-text="detailVideo?.format || 'MP4'"></div>
                     </div>
+                    <div>
+                        <div class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Resolution</div>
+                        <div class="text-sm font-bold text-white/80" x-text="detailVideo?.resolution || '1080P'"></div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Directory Location</div>
+                        <div class="text-[10px] opacity-40 leading-relaxed break-all font-medium text-white/60" x-text="detailVideo?.path || 'Root'"></div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-4 pt-4">
+                    <button @click="playVideo(detailVideo); showModal = false" class="flex-1 px-8 py-4 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 text-sm">
+                        Watch
+                    </button>
+                    <button @click="openInExplorer(detailVideo?.id)" class="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black uppercase tracking-widest hover:bg-white/10 transition-all text-sm">
+                        Locate File
+                    </button>
                 </div>
             </div>
         </div>
@@ -377,7 +561,7 @@
 
 
     <!-- Footer -->
-    <footer class="mt-20 border-t border-white/5 py-10 opacity-30 hover:opacity-100 transition-opacity">
+    <footer x-show="!playing && !searchQuery && !showOnlyFavorites" x-transition.opacity class="mt-20 border-t border-white/5 py-10 opacity-30 hover:opacity-100 transition-opacity">
         <div class="max-w-7xl mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-10">
             <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-4 text-sm font-black uppercase tracking-tighter">
@@ -405,77 +589,233 @@
         </div>
     </footer>
 
-    <!-- Player -->
+    <!-- Player Portal (Elite v24 Modal Style) -->
     <template x-if="playing">
-        <div id="spmh-player-container" x-ref="playerContainer" class="fixed inset-0 z-[9000] bg-black group" x-cloak x-transition.opacity>
-        <!-- Global Right Click Hint Modal (Moved Inside Player for Fullscreen visibility) -->
-        <div x-show="showRightClickHint" x-transition.opacity class="fixed inset-0 z-[9800] bg-black/90 flex items-center justify-center p-6 text-center" @click.stop="showRightClickHint = false" x-cloak>
-            <div class="bg-white/10 backdrop-blur-3xl p-10 rounded-[40px] border border-white/20 max-w-sm space-y-6 shadow-2xl">
-                <svg class="w-20 h-20 mx-auto text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
-                </svg>
-                <h3 class="text-2xl font-black tracking-tighter uppercase">How to change tracks?</h3>
-                <p class="text-white/60 text-sm">To select different audio languages or subtitles, simply **right-click anywhere on the video player** and use the browser's native media settings.</p>
-                <button @click="showRightClickHint = false" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase text-xs hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">Got it!</button>
+        <div id="spmh-player-portal" class="fixed inset-0 z-[9000] flex items-center justify-center p-0 md:p-12" x-transition.opacity.duration.400ms x-cloak>
+            
+            <!-- Main Player Container -->
+            <div :class="isFullscreen ? 'w-screen h-screen rounded-none border-none' : 'relative w-full max-w-6xl aspect-video rounded-none md:rounded-[40px] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,1)]'" 
+                 class="relative z-10 bg-black overflow-hidden group flex flex-col transition-all duration-500 min-w-[300px] min-h-[150px]">
+                
+                <video x-ref="player" 
+                    class="relative w-full h-full object-contain bg-black z-10" 
+                    :src="'/api/stream/' + currentVideo.id" 
+                    @timeupdate="updateProgress()"
+                    @progress="updateHUD()"
+                    @ended="closePlayer()"
+                    @click="togglePlay()"
+                    playsinline></video>
+
+                <!-- UI Overlays -->
+                <div class="absolute inset-0 z-30 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                     :class="(showControls || videoPaused || hoveringTimeline) ? 'opacity-100' : ''">
+                    
+                    <!-- Timeline Preview -->
+                    <div x-show="hoveringTimeline" class="preview-fixed-center" x-cloak x-transition.opacity>
+                        <video x-ref="previewVideo" :src="'/api/stream/' + currentVideo.id" muted class="w-full h-full object-cover"></video>
+                        <div class="preview-time-tag" x-text="formatTime(hoverTime)"></div>
+                    </div>
+
+                    <!-- Top Bar -->
+                    <div class="p-8 flex justify-between items-center bg-gradient-to-b from-black/95 to-transparent pointer-events-auto">
+                        <div class="flex items-center gap-6">
+                            <button @click="closePlayer()" class="p-4 bg-white/5 hover:bg-red-600 rounded-full transition-all group/back">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+                            </button>
+                            <div>
+                                <h2 class="text-xl font-black uppercase tracking-widest leading-none mb-1" x-text="currentVideo?.title"></h2>
+                                <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest">SPMH Elite Hub</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button @click="openInExplorer(currentVideo?.id)" class="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Find File</button>
+                            <button @click="toggleFullscreen()" class="p-4 bg-white/5 hover:bg-white/10 rounded-full transition-all">
+                                <svg x-show="!isFullscreen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                                <svg x-show="isFullscreen" class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0h5M4 4v5m11 0V4m0 0h-5m5 0l-5 5m0 6l5 5m0 0h-5m5 0v-5m-6 0v5m0 0h5m-5 0l-5-5"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Bar -->
+                    <div class="p-10 bg-gradient-to-t from-black/95 to-transparent pointer-events-auto space-y-4 relative">
+                        
+                        <!-- Interactive Timeline -->
+                        <div class="timeline-container" 
+                                @mousemove="handleTimelineMove($event)" 
+                                @mouseleave="hoveringTimeline = false"
+                                @click="seek($event)">
+                            <div class="timeline-track">
+                                <div class="timeline-fill" :style="`width: ${progress}%`"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-8">
+                                <button @click="skip(-10)" class="text-white/60 hover:text-white transition-colors"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/></svg></button>
+                                <button @click="togglePlay()" class="text-white transition-transform hover:scale-110">
+                                    <template x-if="videoPaused"><svg class="w-12 h-12 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></template>
+                                    <template x-if="!videoPaused"><svg class="w-12 h-12 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></template>
+                                </button>
+                                <button @click="skip(10)" class="text-white/60 hover:text-white transition-colors rotate-180"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/></svg></button>
+                                
+                                <!-- Volume Slider -->
+                                <div class="flex items-center gap-4 ml-4 group/vol">
+                                    <button @click="toggleMute()" class="text-white/60 hover:text-white transition-colors">
+                                        <svg x-show="!isMuted" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                        <svg x-show="isMuted" class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+                                    </button>
+                                    <input type="range" min="0" max="1" step="0.01" x-model="volume" @input="updateVolume()" class="player-range w-20 opacity-0 group-hover/vol:opacity-100 transition-all cursor-pointer">
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-6" x-data="{ openTracks: false, openSpeed: false }">
+                                <div class="relative">
+                                    <button @click="openSpeed = !openSpeed" class="text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-all" x-text="playbackRate + 'x'"></button>
+                                    <div x-show="openSpeed" @click.away="openSpeed = false" class="absolute bottom-full mb-4 left-0 bg-black/95 backdrop-blur-3xl border border-white/20 rounded-2xl p-2 w-20 shadow-2xl space-y-1" x-transition x-cloak>
+                                        <template x-for="s in [0.5, 1, 1.5, 2]">
+                                            <button @click="setSpeed(s); openSpeed = false" class="w-full text-center py-2 text-[10px] font-bold rounded-lg hover:bg-red-600 transition-all" :class="playbackRate === s ? 'bg-red-600' : ''" x-text="s + 'x'"></button>
+                                        </template>
+                                    </div>
+                                </div>
+                                <span class="font-mono text-xs text-white/40" x-text="formatTime(currentTime) + ' / ' + formatTime(duration)"></span>
+                                <div class="relative">
+                                    <button @click="showRightClickHint = true" class="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest transition-all">Tracks</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostics HUD (Integrated) -->
+                    <div x-show="debugMode" 
+                         class="absolute top-24 left-10 p-8 bg-black/90 backdrop-blur-3xl border border-white/20 rounded-[40px] font-mono text-[11px] space-y-4 shadow-2xl z-[10000] w-96 pointer-events-auto"
+                         x-transition.scale.origin.top.left
+                         x-cloak>
+                        
+                        <div class="flex items-center justify-between gap-10 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                                <span class="text-red-600 font-black uppercase tracking-tighter text-sm">Engine Telemetry</span>
+                            </div>
+                            <span class="text-white/20 uppercase text-[9px]">ELITE V24</span>
+                        </div>
+
+                        <div class="space-y-3 text-white/80">
+                            <div class="space-y-1 pb-2 border-b border-white/5">
+                                <div class="text-white/30 uppercase text-[9px]">Media Identification</div>
+                                <div class="flex justify-between"><span>ID:</span> <span class="text-white truncate ml-4" x-text="currentVideo?.id"></span></div>
+                                <div class="flex justify-between"><span>Format:</span> <span class="text-yellow-500 uppercase" x-text="currentVideo?.format"></span></div>
+                                <div class="flex justify-between"><span>Resolution:</span> <span class="text-white" x-text="diagData.res"></span></div>
+                            </div>
+
+                            <div class="space-y-1 pb-2 border-b border-white/5">
+                                <div class="text-white/30 uppercase text-[9px]">Browser Pipeline</div>
+                                <div class="flex justify-between"><span>Network:</span> <span class="text-green-500" x-text="diagData.network"></span></div>
+                                <div class="flex justify-between"><span>Ready:</span> <span class="text-blue-400" x-text="diagData.ready"></span></div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <div class="text-white/30 uppercase text-[9px]">Streaming Health</div>
+                                <div class="flex justify-between"><span>Buffer:</span> <span class="text-blue-400" x-text="diagData.buffer + 's / ' + Math.round(duration) + 's'"></span></div>
+                                <div class="mt-2">
+                                    <div class="text-white/30 uppercase text-[9px] mb-1">Resolved Path:</div>
+                                    <div class="text-blue-400 text-[9px] break-all bg-white/5 p-2 rounded-lg" x-text="diagData.src"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-white/10 flex gap-4">
+                            <button @click="copyDebugLog()" class="flex-1 px-4 py-3 bg-white text-black hover:bg-red-600 hover:text-white rounded-2xl transition-all font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                <span x-text="copyStatus"></span>
+                            </button>
+                            <button @click="resetLibrary()" class="flex-1 px-4 py-3 bg-white/10 text-white hover:bg-white/20 rounded-2xl transition-all font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 border border-white/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path></svg>
+                                Reset Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <video x-ref="player" :src="'/api/stream/' + currentVideo.id" autoplay class="w-full h-full object-contain" @timeupdate="updateProgress()" loop></video>
-        
-        <div class="absolute inset-0 z-[1010] flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-            <div class="p-6 md:p-10 flex justify-between items-center pointer-events-auto bg-gradient-to-b from-black/80 to-transparent">
-                <button @click="closePlayer()" class="p-4 bg-white/5 hover:bg-white/20 rounded-full backdrop-blur-md transition-all"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg></button>
-                <h2 class="text-lg md:text-2xl font-black uppercase tracking-widest line-clamp-1" x-text="currentVideo?.title"></h2>
-                <div class="flex items-center gap-6 pointer-events-auto">
-                    <!-- Volume Control -->
-                    <div class="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 group/volume hover:bg-white/20 transition-all">
-                        <button @click="toggleMute()" class="text-white hover:text-red-500 transition-colors">
-                            <template x-if="isMuted || volume == 0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg></template>
-                            <template x-if="!isMuted && volume > 0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg></template>
-                        </button>
-                        <input type="range" min="0" max="1" step="0.01" x-model="volume" @input="updateVolume()" class="w-20 md:w-32 h-1 bg-white/20 rounded-full appearance-none accent-white cursor-pointer">
+    </template>
+
+    <!-- Right Click Hint Modal -->
+    <div x-show="showRightClickHint" x-transition.opacity class="fixed inset-0 z-[9800] bg-black/90 flex items-center justify-center p-6 text-center" @click.stop="showRightClickHint = false" x-cloak>
+        <div class="bg-white/10 backdrop-blur-3xl p-10 rounded-[40px] border border-white/20 max-w-sm space-y-6 shadow-2xl">
+            <svg class="w-20 h-20 mx-auto text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
+            </svg>
+            <h3 class="text-2xl font-black tracking-tighter uppercase">How to change tracks?</h3>
+            <p class="text-white/60 text-sm">To select different audio languages or subtitles, simply **right-click anywhere on the video player** and use the browser's native media settings.</p>
+            <button @click="showRightClickHint = false" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase text-xs hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">Got it!</button>
+        </div>
+    </div>
+    <!-- Brain Rot / TikTok Mode Portal -->
+    <template x-if="showTikTok">
+        <div class="fixed inset-0 z-[9500] bg-black flex flex-col overflow-hidden" x-transition.opacity.duration.500ms>
+            
+            <!-- Video Layers -->
+            <div class="relative flex-1">
+                <!-- Active Layer -->
+                <div class="tiktok-layer" :class="isTikTokTransitioning ? 'opacity-0' : 'opacity-100'">
+                    <video x-ref="tiktokPlayer"
+                           class="w-full h-full object-contain bg-black"
+                           autoplay loop playsinline
+                           :src="'/api/stream/' + tiktokCurrentVideo?.id"
+                           @loadedmetadata="onTikTokLoaded($el)"></video>
+                    
+                    <!-- Overlay Info -->
+                    <div class="absolute inset-x-0 bottom-0 p-12 md:p-20 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <span class="bg-red-600 text-white text-[10px] font-black px-4 py-2 rounded uppercase tracking-widest shadow-lg" x-text="climaxMode ? 'CLIMAX ACTIVE 🥵' : 'NORMAL MODE 🥴'"></span>
+                                <span class="text-white/40 text-xs font-bold uppercase tracking-[0.2em]" x-text="'SWAP: ' + tiktokTimeLeft + 's'"></span>
+                            </div>
+                            <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter drop-shadow-2xl line-clamp-2" x-text="tiktokCurrentVideo?.title"></h1>
+                        </div>
                     </div>
-                    <!-- Subtitles & Audio Help -->
-                    <button @click="showRightClickHint = true" class="px-4 py-3 bg-white/10 hover:bg-red-600 rounded-2xl border border-white/20 text-[10px] md:text-xs font-black uppercase tracking-tighter transition-all flex items-center gap-2 group/btn">
-                        <svg class="w-5 h-5 text-white/70 group-hover/btn:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-                        AUDIO / CC
-                    </button>
-                    <button @click="setSpeed(playbackRate === 2 ? 1 : playbackRate + 0.5)" class="px-4 py-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 text-[10px] md:text-xs font-black uppercase tracking-tighter transition-all">SPEED: <span x-text="playbackRate + 'x'"></span></button>
-                    <!-- Fullscreen Toggle -->
-                    <button @click="toggleFullscreen()" class="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 transition-all flex items-center justify-center group/fs">
-                        <svg x-show="!isFullscreen" class="w-6 h-6 text-white/70 group-hover/fs:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
-                        <svg x-show="isFullscreen" class="w-6 h-6 text-white/70 group-hover/fs:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-cloak><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m11 5l-5-5m0 0h4m-4 0v4m-5 11l5-5m0 0v-4m0 4h-4m-11 5l5-5m0 0h-4m4 0v4"></path></svg>
+                </div>
+
+                <!-- Next Layer (Preload/Fade-in) -->
+                <div class="tiktok-layer" :class="isTikTokTransitioning ? 'opacity-100' : 'opacity-0'">
+                    <video x-ref="tiktokNextPlayer"
+                           class="w-full h-full object-contain bg-black"
+                           muted loop playsinline
+                           :src="'/api/stream/' + tiktokNextVideo?.id"></video>
+                </div>
+
+                <!-- Global Controls -->
+                <div class="absolute top-10 left-10 z-[300] flex items-center gap-6">
+                    <button @click="exitTikTokMode()" class="bg-white/10 hover:bg-red-600 border border-white/10 px-8 py-5 rounded-2xl flex items-center gap-4 font-black uppercase tracking-widest text-[12px] text-white transition-all backdrop-blur-xl">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7 7-7"></path></svg>
+                        Exit Mode
                     </button>
                 </div>
-            </div>
-            <div class="flex items-center justify-center gap-8 md:gap-16 pointer-events-auto">
-                <button @click="skip(-10)" class="p-4 md:p-6 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110 border border-white/10 group">
-                    <svg class="w-8 h-8 md:w-10 md:h-10 text-white/70 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
-                </button>
-                <button @click="togglePlay()" class="p-8 md:p-10 bg-white text-black rounded-full hover:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.3)] transition-all">
-                    <template x-if="videoPaused"><svg class="w-12 h-12 md:w-16 md:h-16 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></template>
-                    <template x-if="!videoPaused"><svg class="w-12 h-12 md:w-16 md:h-16 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></template>
-                </button>
-                <button @click="skip(10)" class="p-4 md:p-6 bg-white/10 hover:bg-white/20 rounded-full transition-all hover:scale-110 border border-white/10 group">
-                    <svg class="w-8 h-8 md:w-10 md:h-10 text-white/70 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M6 5l7 7-7 7"></path></svg>
-                </button>
-            </div>
 
-            <!-- Debug Overlay (Hidden by default, toggle with 'D') -->
-            <div x-show="debugMode" class="absolute top-32 left-10 p-6 bg-black/90 backdrop-blur-xl border border-white/20 rounded-2xl text-[10px] font-mono space-y-2 z-[10000] pointer-events-auto" x-cloak>
-                <div class="flex items-center justify-between gap-4 mb-2">
-                    <div class="text-red-500 font-bold uppercase">System Diagnostics</div>
-                    <button @click="copyDebugLog()" class="px-2 py-1 bg-white/10 hover:bg-red-600 rounded-md text-[8px] pointer-events-auto">COPY LOG</button>
+                <!-- Right Side Interactive Panel -->
+                <div class="absolute right-10 bottom-32 flex flex-col items-center gap-8 z-[300]">
+                    <button @click="triggerTikTokTransition()" class="w-20 h-20 bg-white/10 hover:bg-red-600 border border-white/10 rounded-full flex items-center justify-center transition-all backdrop-blur-xl shadow-2xl group">
+                        <svg class="w-10 h-10 text-white group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 13l-7 7-7-7m14-8l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <button @click="climaxMode = !climaxMode; startTikTokTimer()" 
+                            class="w-20 h-20 rounded-[30px] flex items-center justify-center text-4xl transition-all border border-white/10 backdrop-blur-xl"
+                            :class="climaxMode ? 'bg-red-600 border-red-600 rotate-12 scale-110' : 'bg-white/10'">
+                        <span x-text="climaxMode ? '🥵' : '🥴'"></span>
+                    </button>
+
+                    <div class="flex flex-col items-center gap-6 py-8 px-4 bg-white/10 border border-white/10 rounded-full backdrop-blur-xl">
+                        <div class="h-32 w-2 bg-white/10 rounded-full relative overflow-hidden flex flex-col justify-end">
+                            <div class="bg-red-600 w-full transition-all" :style="`height: ${volume * 100}%`"></div>
+                            <input type="range" x-model="volume" min="0" max="1" step="0.05" @input="syncVolume()" class="absolute inset-0 opacity-0 cursor-pointer" style="writing-mode: bt-lr; appearance: slider-vertical;">
+                        </div>
+                        <svg class="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                    </div>
                 </div>
-                <div>ID: <span class="text-white" x-text="currentVideo?.id"></span></div>
-                <div>FORMAT: <span class="text-yellow-400 font-bold uppercase" x-text="currentVideo?.format"></span></div>
-                <div>STATE: <span x-text="['EMPTY','IDLE','LOADING','NO_SOURCE'][($refs.player?.networkState || 0)]" :class="$refs.player?.networkState === 3 ? 'text-red-500' : 'text-green-500'"></span></div>
-                <div>READY: <span x-text="['NOTHING','METADATA','CURRENT','FUTURE','ENOUGH'][($refs.player?.readyState || 0)]"></span></div>
-                <div>SRC: <span class="text-blue-400" x-text="$refs.player?.currentSrc"></span></div>
-                <div>BUFFERED: <span x-text="$refs.player?.buffered.length ? Math.round($refs.player.buffered.end(0)) + 's' : '0s'"></span></div>
-                <div x-show="$refs.player?.error" class="text-red-600 font-bold">ERROR: <span x-text="$refs.player?.error?.message || 'Code ' + $refs.player?.error?.code"></span></div>
-            </div>
 
-            <div class="p-6 md:p-10 space-y-4 md:space-y-6 pointer-events-auto bg-gradient-to-t from-black/90 to-transparent"><div class="flex items-center justify-between text-[10px] font-black text-white/60 uppercase tracking-widest"><span x-text="formatTime(currentTime)"></span><span x-text="formatTime(duration)"></span></div><div class="relative h-2 bg-white/10 rounded-full cursor-pointer group/bar" @click="seek($event)"><div class="absolute inset-y-0 left-0 bg-red-600 rounded-full transition-all duration-100" :style="'width: ' + progress + '%'"></div></div></div>
+                <!-- Bottom Progress -->
+                <div class="tiktok-progress" :style="`width: ${(tiktokTimeLeft / tiktokMaxTime) * 100}%` "></div>
+            </div>
         </div>
     </template>
     
@@ -498,6 +838,20 @@
                 hoveredVideoId: null, hoverTimeout: null,
                 showDiagnostics: false, scanLog: [],
                 debugMode: false, appLoaded: false,
+                copyStatus: 'Copy Logs', latency: 0,
+                showControls: true, hoveringTimeline: false, hoverTime: 0, lastUpdate: 0,
+                diagData: { network: '', ready: '', buffer: 0, res: '0x0', src: '' },
+                
+                // TikTok Mode State
+                showTikTok: false,
+                tiktokCurrentVideo: null,
+                tiktokNextVideo: null,
+                tiktokTimeLeft: 60,
+                tiktokMaxTime: 60,
+                climaxMode: false,
+                isTikTokTransitioning: false,
+                tiktokTimer: null,
+                tiktokFeed: [],
 
                 async init() {
                     document.addEventListener('keydown', (e) => {
@@ -508,15 +862,85 @@
                         this.isFullscreen = !!document.fullscreenElement;
                     });
                     await this.fetchData();
-                    setInterval(() => { if(!this.showModal && !this.playing && !this.searchQuery && !this.showOnlyFavorites) this.heroIndex = (this.heroIndex + 1) % this.featuredList.length; }, 10000);
+                    // HUD Real-time Update Loop
+                    setInterval(() => { this.updateHUD(); }, 500);
+                    setInterval(() => { if(!this.showModal && !this.playing && !this.searchQuery && !this.showOnlyFavorites && !this.showTikTok) this.heroIndex = (this.heroIndex + 1) % this.featuredList.length; }, 10000);
                     setInterval(() => { this.fetchData(); }, 60000);
+                },
+
+                enterTikTokMode() {
+                    const getAllVideos = (sessions) => {
+                        let vids = [];
+                        sessions.forEach(s => { vids = vids.concat(s.all_videos || s.videos || []); });
+                        return vids;
+                    };
+                    this.tiktokFeed = getAllVideos(this.sections).sort(() => 0.5 - Math.random());
+                    if (this.tiktokFeed.length < 2) return alert("Not enough videos for Brain Rot Mode!");
+                    
+                    this.tiktokCurrentVideo = this.tiktokFeed[0];
+                    this.tiktokNextVideo = this.tiktokFeed[1];
+                    this.showTikTok = true;
+                    this.startTikTokTimer();
+                },
+
+                exitTikTokMode() {
+                    this.showTikTok = false;
+                    clearInterval(this.tiktokTimer);
+                    if (this.$refs.tiktokPlayer) this.$refs.tiktokPlayer.pause();
+                },
+
+                startTikTokTimer() {
+                    this.tiktokTimeLeft = this.climaxMode ? 20 : 60;
+                    this.tiktokMaxTime = this.tiktokTimeLeft;
+                    clearInterval(this.tiktokTimer);
+                    this.tiktokTimer = setInterval(() => {
+                        if (this.tiktokTimeLeft > 0) this.tiktokTimeLeft--;
+                        else this.triggerTikTokTransition();
+                    }, 1000);
+                },
+
+                onTikTokLoaded(el) {
+                    el.currentTime = Math.random() * (el.duration * 0.8 || 1);
+                    el.volume = this.volume;
+                    el.play().catch(() => {});
+                },
+
+                syncVolume() {
+                    if (this.$refs.player) this.$refs.player.volume = this.volume;
+                    if (this.$refs.tiktokPlayer) this.$refs.tiktokPlayer.volume = this.volume;
+                },
+
+                triggerTikTokTransition() {
+                    if (this.isTikTokTransitioning) return;
+                    this.isTikTokTransitioning = true;
+                    
+                    // Cross-fade timing
+                    setTimeout(() => {
+                        const currentIndex = this.tiktokFeed.findIndex(v => v.id === this.tiktokNextVideo.id);
+                        const nextIndex = (currentIndex + 1) % this.tiktokFeed.length;
+                        
+                        this.tiktokCurrentVideo = this.tiktokNextVideo;
+                        this.tiktokNextVideo = this.tiktokFeed[nextIndex];
+                        this.isTikTokTransitioning = false;
+                        this.startTikTokTimer();
+                    }, 1200);
                 },
                 copyDebugLog() {
                     const p = this.$refs.player;
                     if (!p) return;
-                    const log = `ID: ${this.currentVideo?.id}\nSTATE: ${['EMPTY','IDLE','LOADING','NO_SOURCE'][p.networkState]}\nREADY: ${['NOTHING','METADATA','CURRENT','FUTURE','ENOUGH'][p.readyState]}\nSRC: ${p.currentSrc}\nERROR: ${p.error?.message || 'None'}`;
-                    navigator.clipboard.writeText(log);
-                    alert("Debug log copied to clipboard!");
+                    const logString = `[SPMH ENGINE TELEMETRY]\n` +
+                                     `ID: ${this.currentVideo?.id}\n` +
+                                     `FORMAT: ${this.currentVideo?.format} (${this.currentVideo?.codec}) | RES: ${p.videoWidth}x${p.videoHeight}\n` +
+                                     `NETWORK: ${['EMPTY','IDLE','LOADING','NO_SOURCE'][p.networkState]} | READY: ${['NOTHING','METADATA','CURRENT','FUTURE','ENOUGH'][p.readyState]}\n` +
+                                     `LATENCY: ${this.latency}ms\n` +
+                                     `BUFFER: ${p.buffered.length ? Math.round(p.buffered.end(0)) : 0}s/${Math.round(this.duration)}s\n` +
+                                     `SOURCE URL: ${p.currentSrc}\n` +
+                                     `SYSTEM PATH: ${this.currentVideo?.full_path}`;
+                    
+                    navigator.clipboard.writeText(logString).then(() => {
+                        this.copyStatus = 'COPIED!';
+                        setTimeout(() => { this.copyStatus = 'Copy Logs'; }, 2000);
+                    });
                 },
 
                 get filteredSections() {
@@ -537,8 +961,10 @@
                 },
 
                 async fetchData() {
+                    const startTime = Date.now();
                     try {
                         const res = await fetch('/api/hub');
+                        this.latency = Date.now() - startTime;
                         const data = await res.json();
                         this.sections = data.sections;
                         this.scanLog = data.scan_log || [];
@@ -552,7 +978,16 @@
                 },
 
                 shuffleHero() { 
-                    const all = this.sections.flatMap(s => s.videos); 
+                    // Flatten all videos from all sections and sub-sessions
+                    const getAllVideos = (sessions) => {
+                        let vids = [];
+                        sessions.forEach(s => {
+                            vids = vids.concat(s.all_videos || s.videos || []);
+                        });
+                        return vids;
+                    };
+                    
+                    const all = getAllVideos(this.sections);
                     if (all.length > 0) {
                         this.featuredList = [...all].sort(() => 0.5 - Math.random()).slice(0, 5); 
                         this.moreFeatured = [...all].sort(() => 0.5 - Math.random()).slice(0, 10);
@@ -618,38 +1053,101 @@
                 async playVideo(video) {
                     if(!video) return;
                     this.currentVideo = video; 
-                    this.showIntro = true;
+                    this.playing = true; 
+                    this.videoPaused = false; 
+                    this.playbackRate = 1; 
+                    this.showRightClickHint = false;
                     
-                    setTimeout(() => {
-                        this.showIntro = false; 
-                        this.playing = true; 
-                        this.videoPaused = false; 
-                        this.playbackRate = 1; 
-                        this.showRightClickHint = false;
-                        
-                        // Fallback play trigger
-                        this.$nextTick(() => {
-                            const p = this.$refs.player;
-                            if (p) {
-                                p.play().catch(() => {
-                                    console.log("Autoplay blocked, waiting for user...");
-                                    this.videoPaused = true;
-                                });
-                            }
-                        });
-                    }, 1200);
+                    // Fetch real-time metadata for the HUD
+                    try {
+                        const res = await fetch(`/api/video/${video.id}`);
+                        if (res.ok) {
+                            const freshData = await res.json();
+                            this.currentVideo = { ...this.currentVideo, ...freshData };
+                        }
+                    } catch (e) { console.error("HUD Metadata Fetch Error:", e); }
+
+                    this.$nextTick(() => {
+                        const p = this.$refs.player;
+                        const bg = this.$refs.bgVideo;
+                        if (p) {
+                            p.play().catch(() => { this.videoPaused = true; });
+                        }
+                        if (bg) bg.play().catch(() => {});
+                    });
                 },
                 async closePlayer() { 
                     if (this.isFullscreen) this.toggleFullscreen();
                     this.playing = false; 
                     this.currentVideo = null; 
                 },
-                togglePlay() { if (this.$refs.player.paused) { this.$refs.player.play(); this.videoPaused = false; } else { this.$refs.player.pause(); this.videoPaused = true; } },
-                updateProgress() { const p = this.$refs.player; if (p) { this.currentTime = p.currentTime; this.duration = p.duration; this.progress = (p.currentTime / p.duration) * 100; } },
-                seek(e) { const bar = e.currentTarget; const rect = bar.getBoundingClientRect(); const pos = (e.clientX - rect.left) / rect.width; this.$refs.player.currentTime = pos * this.$refs.player.duration; },
+                togglePlay() { 
+                    const p = this.$refs.player;
+                    const bg = this.$refs.bgVideo;
+                    if (p.paused) { 
+                        p.play(); 
+                        if (bg) bg.play();
+                        this.videoPaused = false; 
+                    } else { 
+                        p.pause(); 
+                        if (bg) bg.pause();
+                        this.videoPaused = true; 
+                    } 
+                },
+                updateProgress() { 
+                    const p = this.$refs.player; 
+                    const bg = this.$refs.bgVideo;
+                    if (p && !this.hoveringTimeline) { 
+                        this.currentTime = p.currentTime; 
+                        this.duration = p.duration; 
+                        this.progress = (p.currentTime / p.duration) * 100; 
+                        if (bg && Math.abs(bg.currentTime - p.currentTime) > 0.3) bg.currentTime = p.currentTime;
+                        this.updateHUD();
+                    } 
+                },
+                updateHUD() {
+                    const p = this.$refs.player;
+                    if (!p || !this.playing) return;
+                    this.diagData = {
+                        network: ['EMPTY (0)','IDLE (1)','LOADING (2)','NO_SOURCE (3)'][p.networkState],
+                        ready: ['NOTHING (0)','METADATA (1)','CURRENT (2)','FUTURE (3)','ENOUGH (4)'][p.readyState],
+                        buffer: p.buffered.length ? Math.round(p.buffered.end(0)) : 0,
+                        res: `${p.videoWidth}x${p.videoHeight}`,
+                        src: this.currentVideo?.full_path || 'Not Resolved (Reset Cache Needed)'
+                    };
+                },
+                seek(e) { 
+                    const rect = e.currentTarget.getBoundingClientRect(); 
+                    const pos = (e.clientX - rect.left) / rect.width; 
+                    const time = pos * this.duration;
+                    if (this.$refs.player) this.$refs.player.currentTime = time;
+                    if (this.$refs.bgVideo) this.$refs.bgVideo.currentTime = time;
+                },
                 formatTime(sec) { if (isNaN(sec)) return "00:00"; const m = Math.floor(sec / 60); const s = Math.floor(sec % 60); return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`; },
-                skip(sec) { this.$refs.player.currentTime += sec; },
-                setSpeed(rate) { this.playbackRate = rate; this.$refs.player.playbackRate = rate; },
+                skip(sec) { 
+                    if (this.$refs.player) this.$refs.player.currentTime += sec; 
+                    if (this.$refs.bgVideo) this.$refs.bgVideo.currentTime = this.$refs.player.currentTime;
+                },
+                handleGlobalMove() {
+                    this.showControls = true;
+                    clearTimeout(this.controlsTimeout);
+                    if (this.playing && !this.videoPaused) {
+                        this.controlsTimeout = setTimeout(() => { this.showControls = false; }, 3000);
+                    }
+                },
+                handleTimelineMove(e) {
+                    this.hoveringTimeline = true;
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    this.hoverTime = ratio * this.duration;
+
+                    const now = Date.now();
+                    if (now - this.lastUpdate > 40) {
+                        if (this.$refs.previewVideo) this.$refs.previewVideo.currentTime = this.hoverTime;
+                        this.lastUpdate = now;
+                    }
+                },
+                setSpeed(rate) { this.playbackRate = rate; if (this.$refs.player) this.$refs.player.playbackRate = rate; if (this.$refs.bgVideo) this.$refs.bgVideo.playbackRate = rate; },
                 updateVolume() { this.$refs.player.volume = this.volume; if (this.volume > 0) this.isMuted = false; },
                 toggleMute() { 
                     if (this.isMuted) { this.volume = this.lastVolume; this.isMuted = false; } 
@@ -657,7 +1155,7 @@
                     this.$refs.player.volume = this.volume;
                 },
                 toggleFullscreen() {
-                    const container = document.getElementById('spmh-player-container');
+                    const container = document.getElementById('spmh-player-portal');
                     if (!container) return;
                     if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
                         const requestMethod = container.requestFullscreen || container.webkitRequestFullscreen || container.mozRequestFullScreen || container.msRequestFullscreen;
@@ -675,7 +1173,19 @@
                     }
                 },
                 async openInExplorer(id) { if(id) await fetch(`/api/open/${id}`, { method: 'POST' }); },
-                async confirmShutdown() { try { await fetch('/api/stop', { method: 'POST' }); } catch (e) {} window.close(); }
+                async resetLibrary() { 
+                    if(confirm("Deseja realmente limpar o cache e re-escanear a biblioteca?")) {
+                        await fetch('/api/scan/reset', { method: 'POST' });
+                        window.location.reload();
+                    }
+                },
+                confirmShutdown() { 
+                    fetch('/api/stop', { method: 'POST' }).catch(() => {}); 
+                    setTimeout(() => {
+                        window.open('', '_self', ''); 
+                        window.close();
+                    }, 100);
+                }
             }
         }
     </script>

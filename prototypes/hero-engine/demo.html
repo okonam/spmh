@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPMH Prototype | Hero-Engine v11 (Information Update)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #0a0a0a; color: white; overflow-x: hidden; }
+        [x-cloak] { display: none !important; }
+        
+        .hero-v-mask { 
+            -webkit-mask-image: linear-gradient(to right, black 60%, transparent 85%);
+            mask-image: linear-gradient(to right, black 60%, transparent 85%);
+        }
+
+        .text-glow { text-shadow: 0 2px 40px rgba(0,0,0,0.9); }
+        
+        .progress-line { height: 3px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; width: 40px; }
+        .progress-fill { height: 100%; background: #dc2626; width: 0%; }
+        .active .progress-fill { width: 100%; transition: width 10s linear; }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+        .btn-nav:hover { background: #dc2626; border-color: #dc2626; color: white; transform: scale(1.1); }
+
+        .btn-shuffle-v11 {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .btn-shuffle-v11:hover { background: #dc2626; border-color: #dc2626; transform: rotate(180deg); }
+    </style>
+</head>
+<body x-data="heroEngine()" class="bg-[#0a0a0a]">
+
+    <section class="relative h-[95vh] w-full overflow-hidden bg-black">
+        
+        <template x-for="(hero, index) in featuredList" :key="hero.id">
+            <div x-show="heroIndex === index" x-transition.opacity.duration.1000ms class="absolute inset-0">
+                
+                <div class="absolute inset-0 flex">
+                    <!-- Right Thumb -->
+                    <div class="absolute top-0 right-0 w-[70%] h-full overflow-hidden bg-black">
+                        <img :src="'http://localhost:8888/api/thumb/' + hero.id" class="w-full h-full object-cover opacity-60">
+                    </div>
+                    
+                    <!-- Left Video with Dynamic Start Time -->
+                    <div class="w-[75%] h-full relative overflow-hidden bg-black hero-v-mask">
+                        <video autoplay muted loop playsinline 
+                            :src="'http://localhost:8888/api/stream/' + hero.id" 
+                            class="w-full h-full object-cover opacity-90"
+                            @loadedmetadata="$el.currentTime = Math.random() * ($el.duration * 0.8)"></video>
+                    </div>
+                </div>
+
+                <!-- Content Overlay -->
+                <div class="absolute bottom-[25%] left-10 md:left-20 max-w-4xl z-20">
+                    
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="bg-red-600 text-white text-[10px] font-black px-4 py-2 rounded uppercase tracking-widest shadow-lg">Featured</span>
+                        <button @click="shuffleHero()" class="btn-shuffle-v11 flex items-center gap-3 px-4 py-2 rounded-lg text-[10px] font-black text-white uppercase tracking-widest group">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path></svg>
+                            New Shuffle
+                        </button>
+                    </div>
+
+                    <h1 class="text-5xl md:text-7xl font-black mt-2 mb-10 drop-shadow-2xl line-clamp-2 leading-none tracking-tighter text-white text-glow uppercase" 
+                        x-text="hero.title"></h1>
+
+                    <div class="flex flex-wrap gap-6">
+                        <button class="bg-red-600 text-white px-10 py-4 rounded-2xl font-black flex items-center gap-4 hover:bg-red-700 transition-all text-lg shadow-2xl shadow-red-600/20">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> 
+                            WATCH
+                        </button>
+                        <button class="bg-white/5 text-white px-10 py-4 rounded-2xl font-black flex items-center gap-4 hover:bg-white/10 transition-all backdrop-blur-xl text-lg border border-white/10 uppercase group">
+                            <svg class="w-6 h-6 text-white/40 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Information
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Navigation -->
+        <div class="absolute inset-y-0 left-0 flex items-center px-6 z-50">
+            <button @click="prevHero()" class="btn-nav p-4 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+        </div>
+        <div class="absolute inset-y-0 right-0 flex items-center px-6 z-50">
+            <button @click="nextHero()" class="btn-nav p-4 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
+
+        <div class="absolute bottom-16 left-10 z-30 flex items-center gap-6">
+            <template x-for="(hero, index) in featuredList" :key="'nav-'+hero.id">
+                <button @click="setHero(index)" 
+                        class="group flex flex-col gap-2"
+                        :class="heroIndex === index ? 'active' : ''">
+                    <div class="progress-line">
+                        <div class="progress-fill" :style="`background-color: ${heroIndex === index ? '#dc2626' : 'rgba(255,255,255,0.05)'}`"></div>
+                    </div>
+                </button>
+            </template>
+        </div>
+
+    </section>
+
+    <script>
+        function heroEngine() {
+            return {
+                heroIndex: 0,
+                allVideos: [
+                    { id: '2db75058c64445f404d86657a5e2ef67', title: "The Revenant" },
+                    { id: 'c8b19fb388dc7ab7dd0c557f1e830d54', title: "Interstellar" },
+                    { id: '99a0ddd11c86b0f490bca16becb7146f', title: "O Corvo" },
+                    { id: '9fc343fe2bf3aa15305a1c6aa59f7053', title: "Nightcrawler" },
+                    { id: '21d79e64b00e7894d92cc52c7624f778', title: "Cyberpunk" }
+                ],
+                featuredList: [],
+                autoPlayInterval: null,
+                init() { this.shuffleHero(); },
+                shuffleHero() {
+                    this.featuredList = [...this.allVideos].sort(() => 0.5 - Math.random()).slice(0, 5);
+                    this.heroIndex = 0;
+                    this.startAutoPlay();
+                },
+                startAutoPlay() {
+                    clearInterval(this.autoPlayInterval);
+                    this.autoPlayInterval = setInterval(() => { this.nextHero(); }, 10000);
+                },
+                setHero(index) { this.heroIndex = index; this.startAutoPlay(); },
+                nextHero() { this.heroIndex = (this.heroIndex + 1) % this.featuredList.length; },
+                prevHero() { this.heroIndex = (this.heroIndex - 1 + this.featuredList.length) % this.featuredList.length; }
+            }
+        }
+    </script>
+</body>
+</html>
