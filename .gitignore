@@ -19,3 +19,8 @@ Thumbs.db
 .vscode/
 .idea/
 .gemini/
+
+# Non-essential / Prototypes
+Backup/
+prototypes/
+definicao-do-hero.md
